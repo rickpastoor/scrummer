@@ -1,7 +1,7 @@
 # Scrummer
 
 I'm working with Trello. A lot. I've used the [Scrum for Trello plugin](https://github.com/Q42/TrelloScrum), but I found
-it becoming slow when working with a lot of cards, as I do. So I wrote a new plugin
+it slowing down Trello when working with a lot of cards. So I wrote a new plugin
 from scratch, without dependencies on external libraries to keep the footprint as
 small as possible. Using native browser API's instead of jQuery makes it lightning-fast!
 
