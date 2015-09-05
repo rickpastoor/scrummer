@@ -11,5 +11,5 @@ for each column in your board, nothing else.
 
 ## Features
 
-* Displays the number of points for each card in a badge.
-* Clickable buttons next to the title-field to quickly enter your estimate.
+* Displays the number of points for each card in a badge (this in 0.1).
+* Clickable buttons next to the title-field to quickly enter your estimate (this will be in 0.2).
