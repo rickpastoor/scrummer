@@ -1,5 +1,7 @@
 # Scrummer
 
+[Download Scrummer for Google Chrome](https://chrome.google.com/webstore/detail/scrummer/pmoipljemkkfadmmoenedgfepbefafnp)
+
 I'm working with Trello. A lot. I've used the [Scrum for Trello plugin](https://github.com/Q42/TrelloScrum), but I found
 it slowing down Trello when working with a lot of cards. So I wrote a new plugin
 from scratch, without dependencies on external libraries to keep the footprint as
