@@ -10,5 +10,10 @@
 			"css": ["scrummer.css"]
 		}
 	],
-	"manifest_version" : 2
+	"manifest_version" : 2,
+	"icons": {
+		"48": "icon48.png",
+		"128": "icon128.png",
+		"1024": "icon1024.png"
+	}
 }
