@@ -1,9 +1,18 @@
 .scrummer-points, .scrummer-list-points, .scrummer-picker-button {
-  background-color: rgb(80, 187, 228);
+  background-color: #50BBE4;
+  background-image: -webkit-linear-gradient(bottom, #4CB2D9 50%, #50BBE4 50%);
   padding: 1px 5px;
   margin-right: 3px;
   border-radius: 5px;
   text-decoration: none;
+  color: #fff;
+  font-weight: normal;
+}
+
+.scrummer-points {
+  font-size: 12px;
+  top: -1px;
+  position: relative;
 }
 
 .scrummer-picker-container {
@@ -17,5 +26,5 @@
 }
 
 .scrummer-picker-button:hover {
-  background-color: rgb(63, 171, 212);
+  background-color: #4CB2D9;
 }
