@@ -31,7 +31,7 @@ var listChangeObserver = new MutationObserver(function (mutations) {
     // If the list was modified, recalculate
     if (mutation.target.classList.contains('list-cards') ||
         mutation.target.classList.contains('list-header-num-cards')) {
-      setTimeout(calculateStoryPointsForBoardDebounced, 250);
+      setTimeout(calculateStoryPointsForBoardDebounced);
       return;
     }
 
@@ -39,7 +39,7 @@ var listChangeObserver = new MutationObserver(function (mutations) {
     if (mutation.target.classList.contains('js-card-name')) {
       mutation.target.setAttribute('data-mutated', 1);
 
-      calculateStoryPointsForBoardDebounced();
+      setTimeout(calculateStoryPointsForBoardDebounced);
     }
   });
 });
