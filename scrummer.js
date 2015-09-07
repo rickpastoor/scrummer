@@ -41,7 +41,7 @@ var calculateStoryPointsForTitle = function (title) {
   var matches = title.match(pointsRegex);
   if (matches) {
     if (matches[2] === '?') {
-      return null;
+      return '?';
     }
 
     return parseFloat(matches[2]);
@@ -117,7 +117,10 @@ var calculateStoryPointsForList = function (list) {
 
   var cards = list.querySelectorAll('.list-card:not(.hide)');
   for (var i = 0; i < cards.length; i++) {
-    listPoints += calculateStoryPointsForCard(cards[i])
+		var cardPoints = calculateStoryPointsForCard(cards[i]);
+		if (cardPoints !== '?') {
+    	listPoints += cardPoints;
+		}
   }
 
   var listHeader = list.querySelector('.js-list-name');
@@ -153,7 +156,7 @@ var checkForLists = function () {
 
 			var editControls = document.querySelector('.edit .edit-controls');
 
-			editControls.insertBefore(buildPicker(['?', '0', '1', '3', '5', '8', '13', '20', '40', '100'], function (value, e) {
+			editControls.insertBefore(buildPicker(['X', '?', '0', '1', '3', '5', '8', '13', '20', '40', '100'], function (value, e) {
 				e.stopPropagation();
 
 				var titleField = document.querySelector('.window-title .edit .field');
@@ -163,7 +166,11 @@ var checkForLists = function () {
 				var cleanedTitle = titleField.value.replace('(' + storypointsForTitle + ')', '').trim();
 
 				// Prepend new points
-				titleField.value = '(' + value + ') ' + cleanedTitle;
+				if (value !== 'X') {
+					titleField.value = '(' + value + ') ' + cleanedTitle;
+				} else {
+					titleField.value = cleanedTitle;
+				}
 
 				// Close and save
 				editControls.querySelector('.js-save-edit').click();
