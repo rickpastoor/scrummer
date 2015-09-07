@@ -13,7 +13,7 @@ var debounce = function(func, wait, immediate) {
 	};
 };
 
-var changeObserver = new MutationObserver(function (mutations) {
+var listChangeObserver = new MutationObserver(function (mutations) {
   mutations.forEach(function (mutation) {
     // If the list was modified, recalculate
     if (mutation.target.classList.contains('list-cards') ||
@@ -102,14 +102,14 @@ var calculateStoryPointsForCard = function (card) {
 
 var calculateStoryPointsForList = function (list) {
   // Observe this list for changes
-  changeObserver.observe(list, {
+  listChangeObserver.observe(list, {
     childList: true,
     characterData: false,
     attributes: false,
     subtree: true
   });
 
-  changeObserver.observe(list.querySelector('.list-header-num-cards'), {
+  listChangeObserver.observe(list.querySelector('.list-header-num-cards'), {
     attributes: true
   });
 
@@ -142,4 +142,77 @@ var calculateStoryPointsForBoardDebounced = function () {
   debounce(calculateStoryPointsForBoard, 200, true)();
 }
 
-setTimeout(calculateStoryPointsForBoard, 3000)
+var checkForLists = function () {
+	if (document.querySelectorAll('.list').length > 0) {
+		calculateStoryPointsForBoard();
+
+		setupWindowListener(function () {
+			if (document.querySelector('.scrummer-picker-container')) {
+				return;
+			}
+
+			var editControls = document.querySelector('.edit .edit-controls');
+
+			editControls.insertBefore(buildPicker(['?', '0', '1', '3', '5', '8', '13', '20', '40', '100'], function (value, e) {
+				e.stopPropagation();
+
+				var titleField = document.querySelector('.window-title .edit .field');
+
+				// Remove old points
+				var storypointsForTitle = calculateStoryPointsForTitle(titleField.value);
+				var cleanedTitle = titleField.value.replace('(' + storypointsForTitle + ')', '').trim();
+
+				// Prepend new points
+				titleField.value = '(' + value + ') ' + cleanedTitle;
+
+				// Close and save
+				editControls.querySelector('.js-save-edit').click();
+			}), editControls.firstChild);
+		});
+	} else {
+		setTimeout(checkForLists, 300);
+	}
+}
+
+// Launch the plugin by checking at a certain interval if any
+// lists have been loaded.
+checkForLists();
+
+/**
+ * The point picker
+ */
+var buildPicker = function (values, callback) {
+	var itemsContainer = document.createElement('div');
+	itemsContainer.className = 'scrummer-picker-container';
+
+	values.forEach(function (value) {
+		var button = document.createElement('a');
+		button.innerText = value;
+		button.addEventListener('click', callback.bind(this, value));
+		button.href = 'javascript:;';
+		button.className = 'scrummer-picker-button';
+		itemsContainer.appendChild(button);
+	});
+
+	return itemsContainer;
+}
+
+/**
+ * This sets up a listener to see if a detail window is presented
+ */
+var setupWindowListener = function (callback) {
+	var windowChangeObserver = new MutationObserver(function (mutations) {
+		mutations.forEach(function (mutation) {
+			if (mutation.target.classList.contains('edit-controls')) {
+				callback();
+			}
+		});
+	});
+
+	windowChangeObserver.observe(document.querySelector('.window-overlay'), {
+		childList: true,
+		characterData: false,
+		attributes: false,
+		subtree: true
+	});
+}

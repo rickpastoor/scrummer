@@ -1,6 +1,21 @@
-.scrummer-points, .scrummer-list-points {
+.scrummer-points, .scrummer-list-points, .scrummer-picker-button {
   background-color: rgb(80, 187, 228);
   padding: 1px 5px;
   margin-right: 3px;
   border-radius: 5px;
+  text-decoration: none;
+}
+
+.scrummer-picker-container {
+  margin: 15px 0 15px;
+}
+
+.scrummer-picker-button {
+  font-size: 18px;
+  padding: 3px 9px;
+  margin-right: 5px;
+}
+
+.scrummer-picker-button:hover {
+  background-color: rgb(63, 171, 212);
 }
