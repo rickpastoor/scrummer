@@ -30,7 +30,8 @@ var listChangeObserver = new MutationObserver(function (mutations) {
 
     // If the list was modified, recalculate
     if (mutation.target.classList.contains('list-cards') ||
-        mutation.target.classList.contains('list-header-num-cards')) {
+        mutation.target.classList.contains('list-header-num-cards') ||
+				mutation.target.classList.contains('js-list-sortable')) {
       setTimeout(calculateStoryPointsForBoardDebounced);
       return;
     }
@@ -110,7 +111,6 @@ var calculateStoryPointsForCard = function (card) {
 }
 
 var calculateStoryPointsForList = function (list) {
-  // Observe this list for changes
   listChangeObserver.observe(list, {
     childList: true,
     characterData: false,
@@ -148,6 +148,12 @@ var calculateStoryPointsForBoard = function () {
   for (var i = 0; i < lists.length; i++) {
     calculateStoryPointsForList(lists[i]);
   }
+
+	listChangeObserver.observe(document.querySelector('.js-list-sortable'), {
+    childList: true,
+    characterData: false,
+    attributes: false
+  });
 }
 
 var calculateStoryPointsForBoardDebounced = function () {
