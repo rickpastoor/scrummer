@@ -13,8 +13,21 @@ var debounce = function(func, wait, immediate) {
 	};
 };
 
+var containsNodeWithClass = function (nodeList, className) {
+	for (var i = 0; i < nodeList.length; i++) {
+		if (nodeList[i].classList && nodeList[i].classList.contains(className)) {
+			return true;
+		}
+	}
+}
+
 var listChangeObserver = new MutationObserver(function (mutations) {
   mutations.forEach(function (mutation) {
+		if ((mutation.addedNodes.length === 1 && containsNodeWithClass(mutation.addedNodes, 'scrummer-points')) ||
+				(mutation.removedNodes.length === 1 && containsNodeWithClass(mutation.removedNodes, 'scrummer-points'))) {
+			return;
+		}
+
     // If the list was modified, recalculate
     if (mutation.target.classList.contains('list-cards') ||
         mutation.target.classList.contains('list-header-num-cards')) {
@@ -22,13 +35,9 @@ var listChangeObserver = new MutationObserver(function (mutations) {
       return;
     }
 
-    if (mutation.removedNodes.length === 1 || mutation.addedNodes.length === 1) {
-      return;
-    }
-
     // If a single card's content is mutated
     if (mutation.target.classList.contains('js-card-name')) {
-      mutation.target.setAttribute('data-mutated', true);
+      mutation.target.setAttribute('data-mutated', 1);
 
       calculateStoryPointsForBoardDebounced();
     }
@@ -58,9 +67,10 @@ var calculateStoryPointsForCard = function (card) {
 
   var originalTitle = card.getAttribute('data-original-title');
 
-  if (!originalTitle || cardNameElement.getAttribute('data-mutated')) {
+  if (!originalTitle || cardNameElement.getAttribute('data-mutated') == 1) {
     originalTitle = cardNameElement.lastChild.textContent;
-    card.setAttribute('data-mutated', false);
+		cardNameElement.setAttribute('data-mutated', 0);
+		card.setAttribute('data-original-title', originalTitle);
   }
 
   if (!originalTitle) {
@@ -70,13 +80,10 @@ var calculateStoryPointsForCard = function (card) {
   var calculatedPoints = calculateStoryPointsForTitle(originalTitle);
 
   // If the calculated points are not different from what we have
-  if (card.getAttribute('data-calculated-points') === calculatedPoints) {
+	// (double == is to compare parsed floats and strings correctly)
+  if (card.getAttribute('data-calculated-points') == calculatedPoints) {
     return calculatedPoints;
   }
-
-  // Store the original title and calculated points
-  card.setAttribute('data-original-title', originalTitle);
-  card.setAttribute('data-calculated-points', calculatedPoints);
 
   var badgeElement = card.querySelector('.scrummer-points');
   if (calculatedPoints !== undefined) {
@@ -89,6 +96,8 @@ var calculateStoryPointsForCard = function (card) {
     badgeElement.innerText = calculatedPoints;
 
     cardNameElement.lastChild.textContent = originalTitle.replace('(' + calculatedPoints + ')', '').trim();
+
+		card.setAttribute('data-calculated-points', calculatedPoints);
   } else if (badgeElement) {
     badgeElement.parentNode.removeChild(badgeElement);
   }
@@ -118,7 +127,7 @@ var calculateStoryPointsForList = function (list) {
   var cards = list.querySelectorAll('.list-card:not(.hide)');
   for (var i = 0; i < cards.length; i++) {
 		var cardPoints = calculateStoryPointsForCard(cards[i]);
-		if (cardPoints !== '?') {
+		if (cardPoints && cardPoints !== '?') {
     	listPoints += cardPoints;
 		}
   }
