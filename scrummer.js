@@ -79,7 +79,7 @@ var calculateStoryPointsForCard = function (card) {
   card.setAttribute('data-calculated-points', calculatedPoints);
 
   var badgeElement = card.querySelector('.scrummer-points');
-  if (calculatedPoints) {
+  if (calculatedPoints !== undefined) {
     if (!badgeElement) {
       badgeElement = document.createElement('span');
       badgeElement.className = 'scrummer-points';
