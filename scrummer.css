@@ -28,3 +28,15 @@
 .scrummer-picker-button:hover {
   background-color: #4CB2D9;
 }
+
+.scrummer-separator-card {
+  background-color: #50BBE4;
+  background-image: -webkit-linear-gradient(bottom, #4CB2D9 50%, #50BBE4 50%);  
+}
+
+.scrummer-separator-card .list-card-title {
+  text-align: center;
+  top: 2px;
+  position: relative;
+  color: #fff;
+}
