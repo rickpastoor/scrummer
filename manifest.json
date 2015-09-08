@@ -1,6 +1,6 @@
 {
 	"name": "Scrummer",
-	"version": "0.5",
+	"version": "0.6",
 	"description": "Adds Storypoints to Trello",
 	"content_scripts": [
 		{

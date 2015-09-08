@@ -58,7 +58,7 @@ var calculateStoryPointsForTitle = function (title) {
   }
 }
 
-var calculateStoryPointsForCard = function (card) {
+var calculateStoryPointsForCard = function (card, pointsSinceSeparator) {
   // Get the title from the card
   var cardNameElement = card.querySelector('.js-card-name');
 
@@ -76,6 +76,17 @@ var calculateStoryPointsForCard = function (card) {
 
   if (!originalTitle) {
     return 0;
+  }
+
+  // If this is a separator-card, detect it here
+  if (originalTitle === '#!!') {
+    cardNameElement.lastChild.textContent = pointsSinceSeparator + ' points';
+    card.classList.add('scrummer-separator-card');
+
+    return {
+      points: 0,
+      type: 'separator'
+    };
   }
 
   var calculatedPoints = calculateStoryPointsForTitle(originalTitle);
@@ -123,12 +134,21 @@ var calculateStoryPointsForList = function (list) {
   });
 
   var listPoints = 0;
+  var pointsSinceSeparator = 0;
 
   var cards = list.querySelectorAll('.list-card:not(.hide)');
   for (var i = 0; i < cards.length; i++) {
-    var cardPoints = calculateStoryPointsForCard(cards[i]);
-    if (cardPoints && cardPoints !== '?') {
+    var cardPoints = calculateStoryPointsForCard(cards[i], pointsSinceSeparator);
+
+    if (!cardPoints) {
+      continue;
+    }
+
+    if (cardPoints.type && cardPoints.type === 'separator') {
+      pointsSinceSeparator = 0;
+    } else if (cardPoints !== '?') {
       listPoints += cardPoints;
+      pointsSinceSeparator += cardPoints;
     }
   }
 
