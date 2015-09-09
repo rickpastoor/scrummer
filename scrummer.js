@@ -191,7 +191,7 @@ var checkForLists = function () {
 
       var editControls = document.querySelector('.edit .edit-controls');
 
-      editControls.insertBefore(buildPicker(['X', '?', '0', '1', '3', '5', '8', '13', '20', '40', '100'], function (value, e) {
+      editControls.insertBefore(buildPicker(['X', '?', '0', '1', '2', '3', '5', '8', '13', '20', '40', '100'], function (value, e) {
         e.stopPropagation();
 
         var titleField = document.querySelector('.window-title .edit .field');
