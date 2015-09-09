@@ -61,6 +61,7 @@ var calculateStoryPointsForTitle = function (title) {
 var calculateStoryPointsForCard = function (card, pointsSinceSeparator) {
   // Get the title from the card
   var cardNameElement = card.querySelector('.js-card-name');
+  var contentMutated = false;
 
   if (!cardNameElement) {
     return 0;
@@ -72,6 +73,7 @@ var calculateStoryPointsForCard = function (card, pointsSinceSeparator) {
     originalTitle = cardNameElement.lastChild.textContent;
     cardNameElement.setAttribute('data-mutated', 0);
     card.setAttribute('data-original-title', originalTitle);
+    contentMutated = true;
   }
 
   if (!originalTitle) {
@@ -93,7 +95,7 @@ var calculateStoryPointsForCard = function (card, pointsSinceSeparator) {
 
   // If the calculated points are not different from what we have
   // (double == is to compare parsed floats and strings correctly)
-  if (card.getAttribute('data-calculated-points') == calculatedPoints) {
+  if (!contentMutated && card.getAttribute('data-calculated-points') == calculatedPoints) {
     return calculatedPoints;
   }
 
