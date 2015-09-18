@@ -3,3 +3,13 @@ env:
   matrix:
   - BROWSER=chromium EXT=zip
 script: ./tools/make-${BROWSER}.sh all
+deploy:
+  provider: releases
+  api_key:
+    secure: "cRFPmsNBopsaHsUA6OwosFyfbkhnytybMrpt/nZ2RCT25QLmOoLABK8szkwa9oaiooR9lFaHiNKPQ/lofY6xML51rd8LzkhfV8W+a7FN75OKXa6R9RSqCAR+ptG3RpLqGsyq69OUcyOKKIjX2hmJV8dN8AH53jdajrXxU8ZpfUhMk1VdOHiDYR3WoL0t7J5C+CkRV9pKW35BD+/4Fl2FeFEZ5RsxAhPCGARCRuIhowttt0Nb8tomVL17S438x6DZGajsrvw+EkNG6EyuKnO69iTInGJNg9N0fn+ZXBLYSDcS41bj5KbCYx4WDObz6fglYl5nJNiD0fvbxuBsYopW4ainZNOUPtDLtICbzPuh8plrZ6cGh+IHi6xOeNbt2ERto1Pyh655oPEHxs+1Jz/r8OGPAjqmxXonp2QPloFBxrX2lVPZzzPzTvMLPQ57ZxZ/qoyi2Vf9cJKSff57xWmERGFo+lQu8YFHlwT9T2vCQPbjQyb3F0OC1YAKFxHhxNWJKr9CYp/2lR15Xa+hx+txzvWVK/uzx24257u4kBjyAwT3+r0QpmruR4m59YivwXDxjqTQDKOPDSq8pEiwH4Ns0LwN0zy6uxExGoNQ5LKLbZ8Vy21dFV7Lytz5lYeQJqkDwEsdlzpllOjNxs1oJ0iBZqWf3UOYE4itIJCR8Aceu2U="
+  file: dist/build/scrummer.${BROWSER}.${EXT}
+  skip_cleanup: true
+  on:
+    repo: rickpastoor/scrummer
+    tags: true
+    all_branches: true
