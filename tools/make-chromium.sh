@@ -8,6 +8,7 @@ echo "*** scrummer(Chromium): Copying files"
 DES=./dist/build/scrummer.chromium
 rm -rf $DES
 mkdir -p $DES
+mkdir -p $DES/img/
 
 cp -R ./src/*                           $DES/
 cp -R ./platform/chromium/img/*         $DES/img/
