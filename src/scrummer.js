@@ -108,7 +108,7 @@ var calculateStoryPointsForCard = function (card, pointsSinceSeparator) {
       cardNameElement.insertBefore(badgeElement, cardNameElement.firstChild);
     }
 
-    badgeElement.innerText = calculatedPoints;
+    badgeElement.textContent = calculatedPoints;
 
     cardNameElement.lastChild.textContent = originalTitle.replace('(' + calculatedPoints + ')', '').trim();
 
@@ -163,7 +163,7 @@ var calculateStoryPointsForList = function (list) {
     listHeader.insertBefore(badgeElement, listHeader.firstChild);
   }
 
-  badgeElement.innerText = listPoints;
+  badgeElement.textContent = listPoints;
 }
 
 var calculateStoryPointsForBoard = function () {
@@ -181,6 +181,46 @@ var calculateStoryPointsForBoard = function () {
 
 var calculateStoryPointsForBoardDebounced = function () {
   debounce(calculateStoryPointsForBoard, 200, true)();
+}
+
+/**
+ * The point picker
+ */
+var buildPicker = function (values, callback) {
+  var itemsContainer = document.createElement('div');
+  itemsContainer.className = 'scrummer-picker-container';
+
+  values.forEach(function (value) {
+    var button = document.createElement('a');
+    button.textContent = value;
+    button.addEventListener('click', callback.bind(this, value));
+    button.href = 'javascript:;';
+    button.className = 'scrummer-picker-button';
+    itemsContainer.appendChild(button);
+  });
+
+  return itemsContainer;
+}
+
+/**
+ * This sets up a listener to see if a detail window is presented
+ */
+var setupWindowListener = function (callback) {
+  var windowChangeObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+      if (mutation.target.classList.contains('edit-controls') &&
+          mutation.target.previousSibling.classList.contains('single-line')) {
+        callback();
+      }
+    });
+  });
+
+  windowChangeObserver.observe(document.querySelector('.window-overlay'), {
+    childList: true,
+    characterData: false,
+    attributes: false,
+    subtree: true
+  });
 }
 
 var checkForLists = function () {
@@ -222,43 +262,3 @@ var checkForLists = function () {
 // Launch the plugin by checking at a certain interval if any
 // lists have been loaded.
 checkForLists();
-
-/**
- * The point picker
- */
-var buildPicker = function (values, callback) {
-  var itemsContainer = document.createElement('div');
-  itemsContainer.className = 'scrummer-picker-container';
-
-  values.forEach(function (value) {
-    var button = document.createElement('a');
-    button.innerText = value;
-    button.addEventListener('click', callback.bind(this, value));
-    button.href = 'javascript:;';
-    button.className = 'scrummer-picker-button';
-    itemsContainer.appendChild(button);
-  });
-
-  return itemsContainer;
-}
-
-/**
- * This sets up a listener to see if a detail window is presented
- */
-var setupWindowListener = function (callback) {
-  var windowChangeObserver = new MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-      if (mutation.target.classList.contains('edit-controls') &&
-          mutation.target.previousSibling.classList.contains('single-line')) {
-        callback();
-      }
-    });
-  });
-
-  windowChangeObserver.observe(document.querySelector('.window-overlay'), {
-    childList: true,
-    characterData: false,
-    attributes: false,
-    subtree: true
-  });
-}
