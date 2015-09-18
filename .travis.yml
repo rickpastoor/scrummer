@@ -1,0 +1,5 @@
+sudo: false
+env:
+  matrix:
+  - BROWSER=chromium EXT=zip
+script: ./tools/make-${BROWSER}.sh all
