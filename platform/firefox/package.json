@@ -1,0 +1,13 @@
+{
+  "title": "Scrummer",
+  "name": "scrummer",
+  "version": "0.11.0",
+  "description": "",
+  "main": "index.js",
+  "author": "Rick Pastoor",
+  "engines": {
+    "firefox": ">=38.0a1",
+    "fennec": ">=38.0a1"
+  },
+  "license": ""
+}

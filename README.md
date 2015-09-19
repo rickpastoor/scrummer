@@ -24,9 +24,9 @@ Sketching out your sprints is pretty hard, just like planning in general. I foun
 
 Add a new card with the contents `#!!` anywhere in your board. It will count the points that are added to the card above it. You can add multiple separators in a single column: it will always start counting from the separator above. This allows you to prepare your sprints in advance, all within your Trello board.
 
-## Developing and testing
+## Developing and testing Chrome
 
-To get started with developing your own additions to this plugin, clone this repo and run this command:
+To get started with developing your own additions to this plugin, run this command:
 
 ```
 tools/make-chromium.sh
@@ -34,3 +34,19 @@ tools/make-chromium.sh
 
 After this, add a new unpacked extension to your local Google Chrome and point this to the `dist/build/scrummer.chromium` folder. Now make your changes, run `make-chromium` and refresh your plugin
 in Chrome to see if everything is working as it should. There are no tests yet, because YOLO.
+
+## Developing and testing Firefox
+
+To get started with developing your own additions to this plugin, run this command:
+
+```
+tools/make-firefox.sh
+```
+
+After this, install JPM:
+
+```
+npm install jpm --global
+```
+
+With JPM, you can run the plugin in a debug environment. Change your directory to `dist/build/scrummer.firefox` and run `jpm run`. Now open your Trello board to see if your changes are working as expected. Happy coding!
