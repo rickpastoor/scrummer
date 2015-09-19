@@ -1,6 +1,7 @@
 # Scrummer [![Build Status](https://travis-ci.org/rickpastoor/scrummer.svg?branch=master)](https://travis-ci.org/rickpastoor/scrummer)
 
 [Download Scrummer for Google Chrome](https://chrome.google.com/webstore/detail/scrummer/pmoipljemkkfadmmoenedgfepbefafnp)
+[Download Scrummer for Firefox](https://addons.mozilla.org/nl/firefox/addon/scrummer/)
 
 I'm working with Trello. A lot. I've used the [Scrum for Trello plugin](https://github.com/Q42/TrelloScrum), but I found
 it slowing down Trello when working with a lot of cards. So I wrote a new plugin
