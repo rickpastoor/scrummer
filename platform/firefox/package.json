@@ -1,8 +1,8 @@
 {
-  "id": "scrummer",
+  "id": "scrummer@jetpack",
   "title": "Scrummer",
   "name": "scrummer",
-  "version": "0.15",
+  "version": "0.16",
   "description": "",
   "main": "index.js",
   "author": "Rick Pastoor",
