@@ -18,7 +18,8 @@ mv    $DES/img/icon128.png              $DES/icon.png
 if [ "$1" = all ]; then
     echo "*** scrummer.firefox: Creating package..."
     pushd $DES/
-    zip ../scrummer.firefox.xpi -qr *
+    jpm xpi
+    mv ./@scrummer-*.xpi ./scrummer.firefox.xpi
     popd
 fi
 

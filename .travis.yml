@@ -3,6 +3,8 @@ env:
   matrix:
   - BROWSER=chromium EXT=zip
   - BROWSER=firefox EXT=xpi
+before_script:
+  - npm install -g jpm
 script: ./tools/make-${BROWSER}.sh all
 deploy:
   provider: releases
