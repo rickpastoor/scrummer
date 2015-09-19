@@ -19,7 +19,7 @@ if [ "$1" = all ]; then
     echo "*** scrummer.firefox: Creating package..."
     pushd $DES/
     jpm xpi
-    mv ./@scrummer-*.xpi ./../scrummer.firefox.xpi
+    mv ./scrummer@jetpack-*.xpi ./../scrummer.firefox.xpi
 fi
 
 echo "*** scrummer.firefox: Package done."
