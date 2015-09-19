@@ -1,7 +1,8 @@
 {
+  "id": "scrummer",
   "title": "Scrummer",
   "name": "scrummer",
-  "version": "0.14",
+  "version": "0.15",
   "description": "",
   "main": "index.js",
   "author": "Rick Pastoor",
