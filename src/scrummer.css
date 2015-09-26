@@ -26,10 +26,11 @@
   font-size: 18px;
   padding: 3px 9px;
   margin-right: 5px;
+  color: #fff !important;
 }
 
 .scrummer-picker-button:hover {
-  background-color: #4CB2D9;
+  color: #ccc !important;
 }
 
 .scrummer-separator-card {
@@ -44,5 +45,5 @@
   text-align: center;
   top: 2px;
   position: relative;
-  color: #fff;
+  color: #fff !important;
 }
