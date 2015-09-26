@@ -2,7 +2,7 @@
 #
 # This script assumes a linux environment
 
-echo "*** uMatrix.firefox: Copying files"
+echo "*** scrummer.firefox: Copying files"
 
 DES=dist/build/scrummer.firefox
 rm -rf $DES
