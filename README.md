@@ -4,6 +4,8 @@
 
 [Download Scrummer for Firefox](https://addons.mozilla.org/en-US/firefox/addon/scrummer-1/)
 
+[Download Scrummer for Safari](https://github.com/rickpastoor/scrummer/releases/latest)
+
 I'm working with Trello. A lot. I've used the [Scrum for Trello plugin](https://github.com/Q42/TrelloScrum), but I found
 it slowing down Trello when working with a lot of cards. So I wrote a new plugin
 from scratch, without dependencies on external libraries to keep the footprint as
