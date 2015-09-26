@@ -52,3 +52,33 @@ npm install jpm --global
 ```
 
 With JPM, you can run the plugin in a debug environment. Change your directory to `dist/build/scrummer.firefox` and run `jpm run`. Now open your Trello board to see if your changes are working as expected. Happy coding!
+
+## Developing and testing Safari
+
+To build your own version of the Scrummer for Safari plugin, follow these steps:
+
+Install xar-js:
+
+```
+npm intall xar-js --global
+```
+
+You need to [follow the xar-js README](https://github.com/robertknight/xar-js#building-a-safari-extension) on how to export the required certificate files
+in order to build a valid version of the extension.
+
+After following this guide, you should have these files inside your `platform/safari` folder:
+
+| Filename               |
+|:-----------------------|
+| apple-intermediate.pem |
+| apple-root.pem         |
+| cert.pem               |
+| privatekey.pem         |
+
+Almost ready. Now run this command:
+
+```
+tools/make-safari.sh all
+```
+
+The script will build a `scrummer.safariextz`. Doubleclick it and Safari will ask you if you want to install the extension.
