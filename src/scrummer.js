@@ -180,7 +180,7 @@ var calculateStoryPointsForBoard = function () {
 }
 
 var calculateStoryPointsForBoardDebounced = function () {
-  debounce(calculateStoryPointsForBoard, 200, true)();
+  debounce(calculateStoryPointsForBoard, 100)();
 }
 
 /**
