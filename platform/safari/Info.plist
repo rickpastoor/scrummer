@@ -48,5 +48,7 @@
 			<string>Some</string>
 		</dict>
 	</dict>
+	<key>Update From Gallery</key>
+	<true/>
 </dict>
 </plist>
