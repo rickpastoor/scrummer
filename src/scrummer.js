@@ -208,8 +208,10 @@ var buildPicker = function (values, callback) {
 var setupWindowListener = function (callback) {
   var windowChangeObserver = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
+      var previousSibling = mutation.target.previousSibling;
       if (mutation.target.classList.contains('edit-controls') &&
-          mutation.target.previousSibling.classList.contains('single-line')) {
+          previousSibling.classList.contains('single-line') &&
+          !previousSibling.classList.contains('full')) {
         callback();
       }
     });
