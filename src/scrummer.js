@@ -169,13 +169,27 @@ var calculateStoryPointsForList = function (list) {
   }
 
   badgeElement.textContent = listPoints;
+
+  return listPoints;
 }
 
 var calculateStoryPointsForBoard = function () {
+  var totalPoints = 0;
+
   var lists = document.querySelectorAll('.list');
   for (var i = 0; i < lists.length; i++) {
-    calculateStoryPointsForList(lists[i]);
+    totalPoints += calculateStoryPointsForList(lists[i]);
   }
+
+  var boardHeader = document.querySelector('.js-board-header');
+  var badgeElement = boardHeader.querySelector('.scrummer-board-points');
+  if (!badgeElement) {
+    badgeElement = document.createElement('span');
+    badgeElement.className = 'scrummer-board-points';
+    boardHeader.insertBefore(badgeElement, boardHeader.firstChild);
+  }
+
+  badgeElement.textContent = totalPoints;
 
   listChangeObserver.observe(document.querySelector('.js-list-sortable'), {
     childList: true,
