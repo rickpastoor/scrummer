@@ -82,8 +82,13 @@ var calculateStoryPointsForCard = function (card, pointsSinceSeparator) {
   }
 
   // If this is a separator-card, detect it here
-  if (originalTitle === '#!!') {
+  if (originalTitle.indexOf('#!!') === 0) {
     cardNameElement.lastChild.textContent = pointsSinceSeparator + ' points';
+
+    if (originalTitle.replace('#!!', '').trim().length > 0) {
+      cardNameElement.lastChild.textContent += ' - ' + originalTitle.replace('#!!', '').trim();
+    }
+
     card.classList.add('scrummer-separator-card');
 
     return {

@@ -28,6 +28,8 @@ Sketching out your sprints is pretty hard, just like planning in general. I foun
 
 Add a new card with the contents `#!!` anywhere in your board. It will count the points that are added to the card above it. You can add multiple separators in a single column: it will always start counting from the separator above. This allows you to prepare your sprints in advance, all within your Trello board.
 
+You can also attach a name to a separator, by simply adding it after the `#!!` tag. E.g.: `#!! 1.0 release`.
+
 ## Developing and testing Chrome
 
 To get started with developing your own additions to this plugin, run this command:
