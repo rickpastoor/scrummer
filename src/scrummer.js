@@ -1,3 +1,5 @@
+var pointsScale = '0,1,2,3,5,8,13,20,40,100';
+
 var debounceTimeout;
 
 var debounce = function(func, wait, immediate) {
@@ -255,7 +257,7 @@ var checkForLists = function () {
 
       var editControls = document.querySelector('.edit .edit-controls');
 
-      editControls.insertBefore(buildPicker(['X', '?', '0', '1', '2', '3', '5', '8', '13', '20', '40', '100'], function (value, e) {
+      editControls.insertBefore(buildPicker(['X', '?'].concat(pointsScale.split(',')), function (value, e) {
         e.stopPropagation();
 
         var titleField = document.querySelector('.window-title .edit .field');
