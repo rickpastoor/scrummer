@@ -162,7 +162,7 @@ var calculateStoryPointsForList = function (list) {
     }
   }
 
-  var listHeader = list.querySelector('.js-list-name');
+  var listHeader = list.querySelector('.list-header-name-assist');
   var badgeElement = listHeader.querySelector('.scrummer-list-points');
   if (!badgeElement) {
     badgeElement = document.createElement('span');
