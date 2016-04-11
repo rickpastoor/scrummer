@@ -245,6 +245,37 @@ var setupWindowListener = function (callback) {
   });
 }
 
+Podium = {};
+Podium.keydown = function(k) {
+    var oEvent = document.createEvent('KeyboardEvent');
+
+    // Chromium Hack
+    Object.defineProperty(oEvent, 'keyCode', {
+                get : function() {
+                    return this.keyCodeVal;
+                }
+    });
+    Object.defineProperty(oEvent, 'which', {
+                get : function() {
+                    return this.keyCodeVal;
+                }
+    });
+
+    if (oEvent.initKeyboardEvent) {
+        oEvent.initKeyboardEvent("keydown", true, true, document.defaultView, false, false, false, false, k, k);
+    } else {
+        oEvent.initKeyEvent("keydown", true, true, document.defaultView, false, false, false, false, k, 0);
+    }
+
+    oEvent.keyCodeVal = k;
+
+    if (oEvent.keyCode !== k) {
+        alert("keyCode mismatch " + oEvent.keyCode + "(" + oEvent.which + ")");
+    }
+
+    document.dispatchEvent(oEvent);
+}
+
 var checkForLists = function () {
   if (document.querySelectorAll('.list').length > 0) {
     calculateStoryPointsForBoard();
@@ -254,12 +285,15 @@ var checkForLists = function () {
         return;
       }
 
-      var editControls = document.querySelector('.edit .edit-controls');
+      var editControls = document.querySelector('.js-current-list');
 
       editControls.insertBefore(buildPicker(['X', '?'].concat(pointsScale.split(',')), function (value, e) {
         e.stopPropagation();
 
-        var titleField = document.querySelector('.window-title .edit .field');
+        var titleField = document.querySelector('.js-card-detail-title-input');
+
+        titleField.click();
+        titleField.focus();
 
         // Remove old points
         var storypointsForTitle = calculateStoryPointsForTitle(titleField.value);
@@ -272,8 +306,10 @@ var checkForLists = function () {
           titleField.value = cleanedTitle;
         }
 
-        // Close and save
-        editControls.querySelector('.js-save-edit').click();
+        Podium.keydown(13);
+
+        // Hide controls
+        document.querySelector('.scrummer-picker-container').parentNode.removeChild(document.querySelector('.scrummer-picker-container'));
       }), editControls.firstChild);
     });
   } else {
