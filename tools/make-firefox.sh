@@ -18,7 +18,8 @@ cp -R platform/chromium/img             $DES/
 mv    $DES/img/icon128.png              $DES/icon.png
 
 # Replace version
-sed -i '' 's/SCRUMMER_VERSION/'$SCRUMMER_VERSION'/g' $DES/package.json
+sed -i.bak 's/SCRUMMER_VERSION/'$SCRUMMER_VERSION'/g' $DES/package.json
+rm $DES/package.json.bak
 
 if [ "$1" = all ]; then
     echo "*** scrummer.firefox: Creating package..."

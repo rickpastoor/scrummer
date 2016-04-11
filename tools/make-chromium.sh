@@ -17,7 +17,8 @@ cp -R ./platform/chromium/img/*         $DES/img/
 cp    ./platform/chromium/manifest.json $DES/
 
 # Replace version
-sed -i '' 's/SCRUMMER_VERSION/'$SCRUMMER_VERSION'/g' $DES/manifest.json
+sed -i.bak 's/SCRUMMER_VERSION/'$SCRUMMER_VERSION'/g' $DES/manifest.json
+rm $DES/manifest.bak
 
 if [ "$1" = all ]; then
     echo "*** scrummer.chromium: Creating package..."
