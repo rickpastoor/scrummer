@@ -229,20 +229,19 @@ var buildPicker = function (values, callback) {
 var setupWindowListener = function (callback) {
   var windowChangeObserver = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
-      var previousSibling = mutation.target.previousSibling;
-      if (mutation.target.classList.contains('edit-controls') &&
-          previousSibling.classList.contains('single-line') &&
-          !previousSibling.classList.contains('full')) {
+      if (mutation.target.classList.contains('js-card-detail-title-input') &&
+        mutation.target.classList.contains('is-editing')) {
         callback();
       }
     });
   });
 
   windowChangeObserver.observe(document.querySelector('.window-overlay'), {
-    childList: true,
+    childList: false,
     characterData: false,
-    attributes: false,
-    subtree: true
+    attributes: true,
+    subtree: true,
+    attributeFilter: ['class']
   });
 }
 
