@@ -18,6 +18,16 @@
   position: relative;
 }
 
+.scrummer-list-points {
+  float: left;
+}
+
+textarea.mod-list-name.list-header-name {
+  float: left;
+  width: 80%;
+  margin: -3px -2px;
+}
+
 .scrummer-picker-container {
   margin: 15px 0 15px;
 }
