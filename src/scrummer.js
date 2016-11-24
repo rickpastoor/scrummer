@@ -79,6 +79,11 @@ var calculateStoryPointsForCard = function (card, pointsSinceSeparator) {
     contentMutated = true;
   }
 
+  // Trello sometimes drops our badge, so if that happens we need to redraw
+  if (card.getAttribute('data-calculated-points') !== null && !card.querySelector('.scrummer-points')) {
+    contentMutated = true;
+  }
+
   if (!originalTitle) {
     return 0;
   }
