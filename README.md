@@ -64,7 +64,7 @@ To build your own version of the Scrummer for Safari plugin, follow these steps:
 Install xar-js:
 
 ```
-npm intall xar-js --global
+npm install xar-js --global
 ```
 
 You need to [follow the xar-js README](https://github.com/robertknight/xar-js#building-a-safari-extension) on how to export the required certificate files
