@@ -1,5 +1,5 @@
 {
-	"name": "Scrummer",
+	"name": "ScrummerTheodo",
 	"version": "SCRUMMER_VERSION",
 	"description": "Adds Storypoints to Trello",
 	"content_scripts": [

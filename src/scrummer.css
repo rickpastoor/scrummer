@@ -1,25 +1,41 @@
-.scrummer-points, .scrummer-list-points, .scrummer-board-points, .scrummer-picker-button {
-  background: #47bae0; /* Old browsers */
-  background: -moz-linear-gradient(top,  #47bae0 50%, #4dbbe2 50%, #33b5e0 50%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(50%,#47bae0), color-stop(50%,#4dbbe2), color-stop(50%,#33b5e0)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top,  #47bae0 50%,#4dbbe2 50%,#33b5e0 50%); /* Chrome10+,Safari5.1+ */
-  background: linear-gradient(to bottom,  #47bae0 50%,#4dbbe2 50%,#33b5e0 50%); /* W3C */
+.scrummer-points, .scrummer-list-points, .scrummer-board-points, .scrummer-picker-button,
+.scrummer-post-points, .scrummer-list-post-points, .scrummer-board-post-points, .scrummer-picker-post-button {
   padding: 1px 5px;
   margin-right: 3px;
-  border-radius: 5px;
+
   text-decoration: none;
   color: #fff;
   font-weight: normal;
 }
 
-.scrummer-points {
+.scrummer-points, .scrummer-list-points, .scrummer-board-points, .scrummer-picker-button {
+  background: #47bae0;
+  background: linear-gradient(to bottom,  #47bae0 50%, #4dbbe2 50%, #33b5e0 50%); /* W3C */
+  border-radius: 5px;
+}
+
+.scrummer-post-points, .scrummer-list-post-points, .scrummer-board-post-points, .scrummer-picker-post-button {
+  background: #81cae2;
+  background: linear-gradient(to bottom,  #81cae2 50%, #79c6e0 50%, #6cc1dd 50%); /* W3C */
+}
+
+.scrummer-points, .scrummer-post-points {
   font-size: 12px;
   top: -1px;
   position: relative;
 }
 
-.scrummer-list-points {
+.scrummer-list-points, .scrummer-list-post-points {
   float: left;
+}
+
+.scrummer-board-points, .scrummer-board-post-points {
+  float: left;
+  margin-top: 6px;
+}
+
+.scrummer-board-post-points {
+  margin-right: -3px;
 }
 
 textarea.mod-list-name.list-header-name {
@@ -30,6 +46,10 @@ textarea.mod-list-name.list-header-name {
 
 .scrummer-picker-container {
   margin: 15px 0 15px;
+}
+
+.scrummer-picker-row {
+  height: 30px;
 }
 
 .scrummer-picker-button {
@@ -43,22 +63,13 @@ textarea.mod-list-name.list-header-name {
   color: #ccc !important;
 }
 
-.scrummer-separator-card {
-  background: #47bae0; /* Old browsers */
-  background: -moz-linear-gradient(top,  #47bae0 50%, #4dbbe2 50%, #33b5e0 50%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(50%,#47bae0), color-stop(50%,#4dbbe2), color-stop(50%,#33b5e0)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top,  #47bae0 50%,#4dbbe2 50%,#33b5e0 50%); /* Chrome10+,Safari5.1+ */
-  background: linear-gradient(to bottom,  #47bae0 50%,#4dbbe2 50%,#33b5e0 50%); /* W3C */
-}
-
-.scrummer-separator-card .list-card-title {
-  text-align: center;
-  top: 2px;
-  position: relative;
+.scrummer-picker-post-button {
+  font-size: 18px;
+  padding: 3px 9px;
+  margin-right: 5px;
   color: #fff !important;
 }
 
-.scrummer-board-points {
-  float: left;
-  margin: 6px -3px 0 0;
+.scrummer-picker-post-button:hover {
+  color: #ccc !important;
 }
