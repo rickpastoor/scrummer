@@ -1,7 +1,7 @@
 {
 	"name": "ScrummerTheodo",
 	"version": "SCRUMMER_VERSION",
-	"description": "Adds Storypoints to Trello",
+	"description": "Adds story points, post-estimation points and card ID to Trello",
 	"content_scripts": [
 		{
       "run_at": "document_end",
