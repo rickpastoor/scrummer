@@ -26,9 +26,11 @@ var containsNodeWithClass = function (nodeList, className) {
 
 var listChangeObserver = new MutationObserver(function (mutations) {
   mutations.forEach(function (mutation) {
+    // if the mutation was triggered by us adding or removing badges, do not recalculate
     if (
       (mutation.addedNodes.length === 1 && containsNodeWithClass(mutation.addedNodes, 'scrummer-points')) ||
       (mutation.addedNodes.length === 1 && containsNodeWithClass(mutation.addedNodes, 'scrummer-post-points')) ||
+      (mutation.addedNodes.length === 1 && containsNodeWithClass(mutation.addedNodes, 'scrummer-card-id')) ||
       (mutation.removedNodes.length === 1 && containsNodeWithClass(mutation.removedNodes, 'scrummer-points')) ||
       (mutation.removedNodes.length === 1 && containsNodeWithClass(mutation.removedNodes, 'scrummer-post-points'))
     ) return;
@@ -50,15 +52,13 @@ var listChangeObserver = new MutationObserver(function (mutations) {
   });
 });
 
-var pointsRegex = /((?:^|\s))\((\x3f|\d*\.?\d+)(\))\s?/m
-var postPointsRegex = /((?:^|\s))\[(\x3f|\d*\.?\d+)(\])\s?/m
-
 var findOrInsertSpan = function(parent, className, insertBeforeClass) {
   var span = parent.querySelector('.' + className);
   if (!span) {
     span = document.createElement('span');
     span.className = className;
-    parent.insertBefore(span, parent.querySelector('.' + insertBeforeClass));
+    var insertBeforeElement = (insertBeforeClass ? parent.querySelector('.' + insertBeforeClass) : parent.firstChild);
+    parent.insertBefore(span, insertBeforeElement);
   }
   return span;
 }
@@ -71,22 +71,22 @@ var removeIfExists = function(parent, className) {
 }
 
 var calculateStoryPointsForTitle = function (title) {
-  var matches = title.match(pointsRegex);
+  var matches = title.match(/\((\?|\d+\.?\d*)\)/m);
   if (matches) {
-    if (matches[2] === '?') {
+    if (matches[1] === '?') {
       return '?';
     }
-    return parseFloat(matches[2]);
+    return parseFloat(matches[1]);
   }
 }
 
 var calculatePostPointsForTitle = function (title) {
-  var matches = title.match(postPointsRegex);
+  var matches = title.match(/\[(\?|\d+\.?\d*)\]/m);
   if (matches) {
-    if (matches[2] === '?') {
+    if (matches[1] === '?') {
       return '?';
     }
-    return parseFloat(matches[2]);
+    return parseFloat(matches[1]);
   }
 }
 
@@ -95,10 +95,16 @@ var calculatePointsForCard = function (card) {
 
   var cardNameElement = card.querySelector('.js-card-name');
   if (!cardNameElement) {
-    return 0;
+    return {
+      story: 0,
+      post: 0
+    };
   }
 
   var originalTitle = card.getAttribute('data-original-title');
+  var cardShortId = cardNameElement.querySelector('.card-short-id');
+  var cardIdElement = findOrInsertSpan(cardNameElement, 'scrummer-card-id');
+  cardIdElement.textContent = cardShortId.textContent;
 
   if (!originalTitle || cardNameElement.getAttribute('data-mutated') == 1) {
     originalTitle = cardNameElement.lastChild.textContent;
@@ -116,7 +122,10 @@ var calculatePointsForCard = function (card) {
   }
 
   if (!originalTitle) {
-    return 0;
+    return {
+      story: 0,
+      post: 0
+    };
   }
 
   var calculatedPoints = calculateStoryPointsForTitle(originalTitle);
@@ -240,14 +249,14 @@ var buildPicker = function (values, callback) {
     var button = document.createElement('a');
     button.textContent = value;
     button.href = 'javascript:;';
-    var postButton = button.cloneNode();
+    var postButton = button.cloneNode(true);
 
     button.addEventListener('click', callback.bind(this, value, 'story'));
     button.className = 'scrummer-picker-button';
     firstRow.appendChild(button);
     postButton.addEventListener('click', callback.bind(this, value, 'post'));
     postButton.className = 'scrummer-picker-post-button';
-    secondRow.appendChild(button);
+    secondRow.appendChild(postButton);
   });
 
   return itemsContainer;
@@ -348,6 +357,6 @@ var checkForLists = function () {
   }
 }
 
-// Launch the plugin by checking at a certain interval if any
-// lists have been loaded.
-checkForLists();
+// Launch the plugin by checking at a certain interval if any lists have been loaded.
+// Wait 1 second because some DOM rebuilding may happen late.
+setTimeout(checkForLists, 1000);

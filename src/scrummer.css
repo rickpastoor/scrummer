@@ -34,13 +34,9 @@
   margin-top: 6px;
 }
 
-.scrummer-board-post-points {
-  margin-right: -3px;
-}
-
 textarea.mod-list-name.list-header-name {
   float: left;
-  width: 80%;
+  width: 60%;
   margin: -3px -2px;
 }
 
@@ -72,4 +68,8 @@ textarea.mod-list-name.list-header-name {
 
 .scrummer-picker-post-button:hover {
   color: #ccc !important;
+}
+
+.scrummer-card-id::after {
+  content: ' ';
 }
