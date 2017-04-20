@@ -71,22 +71,20 @@ var removeIfExists = function(parent, className) {
 }
 
 var calculateStoryPointsForTitle = function (title) {
-  var matches = title.match(/\((\?|\d+\.?\d*)\)/m);
+  var matches = title.match(/\((\?|\d+\.?,?\d*)\)/m);
   if (matches) {
-    if (matches[1] === '?') {
-      return '?';
-    }
-    return parseFloat(matches[1]);
+    var points = matches[1];
+    if (points === '?') return '?';
+    return parseFloat(points.replace(',','.'));
   }
 }
 
 var calculatePostPointsForTitle = function (title) {
-  var matches = title.match(/\[(\?|\d+\.?\d*)\]/m);
+  var matches = title.match(/\[(\?|\d+\.?,?\d*)\]/m);
   if (matches) {
-    if (matches[1] === '?') {
-      return '?';
-    }
-    return parseFloat(matches[1]);
+    var points = matches[1];
+    if (points === '?') return '?';
+    return parseFloat(points.replace(',','.'));
   }
 }
 
@@ -170,8 +168,8 @@ var calculatePointsForCard = function (card) {
   }
 
   cardNameElement.lastChild.textContent = originalTitle
-  .replace('(' + calculatedPoints + ')', '')
-  .replace('[' + calculatedPostPoints + ']', '')
+  .replace(/\((\?|\d+\.?,?\d*)\)/m, '')
+  .replace(/\[(\?|\d+\.?,?\d*)\]/m, '')
   .trim();
 
   return {
