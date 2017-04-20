@@ -227,11 +227,14 @@ var calculatePointsForBoard = function () {
   }
 
   var boardHeader = document.querySelector('.js-board-header');
-  // Add or update points badges
-  var badgeElement = findOrInsertSpan(boardHeader, 'scrummer-board-points', 'board-header-btn-name');
-  badgeElement.textContent = Math.round(boardPoints.story * 10) / 10;
-  var postBadgeElement = findOrInsertSpan(boardHeader, 'scrummer-board-post-points', 'board-header-btn-name');
-  postBadgeElement.textContent = Math.round(boardPoints.post * 10) / 10;
+
+  if (boardHeader) {
+    // Add or update points badges
+    var badgeElement = findOrInsertSpan(boardHeader, 'scrummer-board-points', 'board-header-btn-name');
+    badgeElement.textContent = Math.round(boardPoints.story * 10) / 10;
+    var postBadgeElement = findOrInsertSpan(boardHeader, 'scrummer-board-post-points', 'board-header-btn-name');
+    postBadgeElement.textContent = Math.round(boardPoints.post * 10) / 10;
+  }
 
   listChangeObserver.observe(document.querySelector('.js-list-sortable'), {
     childList: true,
