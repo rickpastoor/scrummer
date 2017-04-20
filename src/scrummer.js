@@ -90,6 +90,17 @@ var calculatePostPointsForTitle = function (title) {
   }
 }
 
+var sanitizePoints = function (points) {
+  if (points === '?') return 0;
+  if (!points) return 0;
+  return points;
+}
+
+var formatPoints = function (points) {
+  if (points === '?') return '?';
+  return Math.round(points * 10) / 10;
+}
+
 var calculatePointsForCard = function (card) {
   var contentMutated = false;
 
@@ -144,7 +155,7 @@ var calculatePointsForCard = function (card) {
 
   if (calculatedPoints !== undefined) {
     var badgeElement = findOrInsertSpan(cardNameElement, 'scrummer-points', 'card-short-id');
-    badgeElement.textContent = Math.round(calculatedPoints * 10) / 10;
+    badgeElement.textContent = formatPoints(calculatedPoints);
     card.setAttribute('data-calculated-points', calculatedPoints);
   } else {
     removeIfExists(cardNameElement, 'scrummer-points');
@@ -152,7 +163,7 @@ var calculatePointsForCard = function (card) {
 
   if (calculatedPostPoints !== undefined) {
     var badgeElement = findOrInsertSpan(cardNameElement, 'scrummer-post-points', 'card-short-id');
-    badgeElement.textContent = Math.round(calculatedPostPoints * 10) / 10;
+    badgeElement.textContent = formatPoints(calculatedPostPoints);
     card.setAttribute('data-calculated-post-points', calculatedPostPoints);
   } else {
     removeIfExists(cardNameElement, 'scrummer-post-points');
@@ -164,8 +175,8 @@ var calculatePointsForCard = function (card) {
   .trim();
 
   return {
-    story: calculatedPoints || 0,
-    post: calculatedPostPoints || 0
+    story: sanitizePoints(calculatedPoints),
+    post: sanitizePoints(calculatedPostPoints)
   };
 }
 
