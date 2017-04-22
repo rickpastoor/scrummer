@@ -1,4 +1,6 @@
-var pointsScale = '0.5,0,1,2,3,5,8,13,20,40,100';
+var pointsScale = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100];
+var storyPointsRegexp = /\((\?|\d+\.?,?\d*)\)/m;
+var postPointsRegexp = /\[(\?|\d+\.?,?\d*)\]/m;
 
 var debounceTimeout;
 
@@ -71,7 +73,8 @@ var removeIfExists = function(parent, className) {
 }
 
 var calculateStoryPointsForTitle = function (title) {
-  var matches = title.match(/\((\?|\d+\.?,?\d*)\)/m);
+  if (!settings.showStoryPoints) return;
+  var matches = title.match(storyPointsRegexp);
   if (matches) {
     var points = matches[1];
     if (points === '?') return '?';
@@ -80,7 +83,8 @@ var calculateStoryPointsForTitle = function (title) {
 }
 
 var calculatePostPointsForTitle = function (title) {
-  var matches = title.match(/\[(\?|\d+\.?,?\d*)\]/m);
+  if (!settings.showPostPoints) return;
+  var matches = title.match(postPointsRegexp);
   if (matches) {
     var points = matches[1];
     if (points === '?') return '?';
@@ -111,9 +115,12 @@ var calculatePointsForCard = function (card) {
   }
 
   var originalTitle = card.getAttribute('data-original-title');
-  var cardShortId = cardNameElement.querySelector('.card-short-id');
-  var cardIdElement = findOrInsertSpan(cardNameElement, 'scrummer-card-id');
-  cardIdElement.textContent = cardShortId.textContent;
+
+  if (settings.showCardNumbers) {
+    var cardShortId = cardNameElement.querySelector('.card-short-id');
+    var cardIdElement = findOrInsertSpan(cardNameElement, 'scrummer-card-id');
+    cardIdElement.textContent = cardShortId.textContent;
+  }
 
   if (!originalTitle || cardNameElement.getAttribute('data-mutated') == 1) {
     originalTitle = cardNameElement.lastChild.textContent;
@@ -167,10 +174,10 @@ var calculatePointsForCard = function (card) {
     removeIfExists(cardNameElement, 'scrummer-post-points');
   }
 
-  cardNameElement.lastChild.textContent = originalTitle
-  .replace(/\((\?|\d+\.?,?\d*)\)/m, '')
-  .replace(/\[(\?|\d+\.?,?\d*)\]/m, '')
-  .trim();
+  var cleanedTitle = originalTitle;
+  if (settings.showStoryPoints) cleanedTitle = cleanedTitle.replace(storyPointsRegexp, '');
+  if (settings.showPostPoints)  cleanedTitle = cleanedTitle.replace(postPointsRegexp, '');
+  cardNameElement.lastChild.textContent = cleanedTitle.trim();
 
   return {
     story: sanitizePoints(calculatedPoints),
@@ -189,49 +196,53 @@ var calculatePointsForList = function (list) {
     attributes: true
   });
 
-  var listPoints = {
-    story: 0,
-    post: 0
-  };
+  // Array.slice can convert a NodeList to an array
+  var listPoints = Array.prototype.slice.call(list.querySelectorAll('.list-card:not(.hide)'))
+  .reduce((listPoints, list) => {
+    var cardPoints = calculatePointsForCard(list);
+    listPoints.story += cardPoints.story;
+    listPoints.post += cardPoints.post;
+    return listPoints;
+  }, { story: 0, post: 0 });
 
-  var cards = list.querySelectorAll('.list-card:not(.hide)');
-  for (var i = 0; i < cards.length; i++) {
-    var points = calculatePointsForCard(cards[i]);
-    listPoints.story += points.story;
-    listPoints.post += points.post;
+  var listHeader = null;
+  if (settings.showColumnTotals && (listHeader = list.querySelector('.js-list-header'))) {
+    // Add or update points badges
+    if (settings.showStoryPoints) {
+      var badge = findOrInsertSpan(listHeader, 'scrummer-list-points', 'js-list-name-input');
+      badge.textContent = formatPoints(listPoints.story);
+    }
+    if (settings.showPostPoints) {
+      var badge = findOrInsertSpan(listHeader, 'scrummer-list-post-points', 'js-list-name-input');
+      badge.textContent = formatPoints(listPoints.post);
+    }
   }
-
-  var listHeader = list.querySelector('.js-list-header');
-  // Add or update points badges
-  var badgeElement = findOrInsertSpan(listHeader, 'scrummer-list-points', 'js-list-name-input');
-  badgeElement.textContent = Math.round(listPoints.story * 10) / 10;
-  var postBadgeElement = findOrInsertSpan(listHeader, 'scrummer-list-post-points', 'js-list-name-input');
-  postBadgeElement.textContent = Math.round(listPoints.post * 10) / 10;
 
   return listPoints;
 }
 
 var calculatePointsForBoard = function () {
-  var boardPoints = {
-    story: 0,
-    post: 0
-  };
 
-  var lists = document.querySelectorAll('.list');
-  for (var i = 0; i < lists.length; i++) {
-    var points = calculatePointsForList(lists[i]);
-    boardPoints.story += points.story;
-    boardPoints.post += points.post;
-  }
+  // Array.slice can convert a NodeList to an array
+  var boardPoints = Array.prototype.slice.call(document.querySelectorAll('.list'))
+  .reduce((boardPoints, list) => {
+    var listPoints = calculatePointsForList(list);
+    boardPoints.story += listPoints.story;
+    boardPoints.post += listPoints.post;
+    return boardPoints;
+  }, { story: 0, post: 0 });
 
-  var boardHeader = document.querySelector('.js-board-header');
-
-  if (boardHeader) {
+  var boardHeader = null;
+  if (settings.showBoardTotals && (boardHeader = document.querySelector('.js-board-header'))) {
     // Add or update points badges
-    var badgeElement = findOrInsertSpan(boardHeader, 'scrummer-board-points', 'board-header-btn-name');
-    badgeElement.textContent = Math.round(boardPoints.story * 10) / 10;
-    var postBadgeElement = findOrInsertSpan(boardHeader, 'scrummer-board-post-points', 'board-header-btn-name');
-    postBadgeElement.textContent = Math.round(boardPoints.post * 10) / 10;
+    if (settings.showStoryPoints) {
+      var badge = findOrInsertSpan(boardHeader, 'scrummer-board-points', 'board-header-btn-name');
+      badge.textContent = formatPoints(boardPoints.story);
+    }
+    if (settings.showPostPoints) {
+      var badge = findOrInsertSpan(boardHeader, 'scrummer-board-post-points', 'board-header-btn-name');
+      badge.textContent = formatPoints(boardPoints.post);
+    }
   }
 
   listChangeObserver.observe(document.querySelector('.js-list-sortable'), {
@@ -245,31 +256,31 @@ var calculatePointsForBoardDebounced = function () {
   debounce(calculatePointsForBoard, 100)();
 }
 
-/**
- * The point picker
- */
-var buildPicker = function (values, callback) {
-  var itemsContainer = document.createElement('div');
-  itemsContainer.className = 'scrummer-picker-container';
-  var firstRow = document.createElement('div');
-  firstRow.className = 'scrummer-picker-row';
-  var secondRow = firstRow.cloneNode(true);
-  itemsContainer.appendChild(firstRow);
-  itemsContainer.appendChild(secondRow);
+var buildPickerRow = (storyOrPost) => {
+  var row = document.createElement('div');
+  row.className = 'scrummer-picker-row';
 
-  values.forEach(function (value) {
+  pointsScale.forEach(function (value) {
     var button = document.createElement('a');
     button.textContent = value;
     button.href = 'javascript:;';
-    var postButton = button.cloneNode(true);
 
-    button.addEventListener('click', callback.bind(this, value, 'story'));
-    button.className = 'scrummer-picker-button';
-    firstRow.appendChild(button);
-    postButton.addEventListener('click', callback.bind(this, value, 'post'));
-    postButton.className = 'scrummer-picker-post-button';
-    secondRow.appendChild(postButton);
+    button.addEventListener('click', insertPoints.bind(this, value, storyOrPost));
+    button.className = storyOrPost === 'story' ? 'scrummer-picker-button' : 'scrummer-picker-post-button';
+    row.appendChild(button);
   });
+
+  return row;
+}
+
+/**
+ * The point picker
+ */
+var buildPicker = function () {
+  var itemsContainer = document.createElement('div');
+  itemsContainer.className = 'scrummer-picker-container';
+  if (settings.showStoryPoints) itemsContainer.appendChild(buildPickerRow('story'));
+  if (settings.showPostPoints) itemsContainer.appendChild(buildPickerRow('post'));
 
   return itemsContainer;
 }
@@ -298,77 +309,92 @@ var setupWindowListener = function (callback) {
 
 Podium = {};
 Podium.keydown = function(k) {
-    var oEvent = document.createEvent('KeyboardEvent');
+  var oEvent = document.createEvent('KeyboardEvent');
 
-    // Chromium Hack
-    Object.defineProperty(oEvent, 'keyCode', {
-                get : function() {
-                    return this.keyCodeVal;
-                }
-    });
-    Object.defineProperty(oEvent, 'which', {
-                get : function() {
-                    return this.keyCodeVal;
-                }
-    });
-
-    if (oEvent.initKeyboardEvent) {
-        oEvent.initKeyboardEvent("keydown", true, true, document.defaultView, false, false, false, false, k, k);
-    } else {
-        oEvent.initKeyEvent("keydown", true, true, document.defaultView, false, false, false, false, k, 0);
+  // Chromium Hack
+  Object.defineProperty(oEvent, 'keyCode', {
+    get: function() {
+      return this.keyCodeVal;
     }
-
-    oEvent.keyCodeVal = k;
-
-    if (oEvent.keyCode !== k) {
-        alert("keyCode mismatch " + oEvent.keyCode + "(" + oEvent.which + ")");
+  });
+  Object.defineProperty(oEvent, 'which', {
+    get: function() {
+      return this.keyCodeVal;
     }
+  });
 
-    document.dispatchEvent(oEvent);
+  if (oEvent.initKeyboardEvent) {
+    oEvent.initKeyboardEvent("keydown", true, true, document.defaultView, false, false, false, false, k, k);
+  } else {
+    oEvent.initKeyEvent("keydown", true, true, document.defaultView, false, false, false, false, k, 0);
+  }
+
+  oEvent.keyCodeVal = k;
+
+  if (oEvent.keyCode !== k) {
+    alert("keyCode mismatch " + oEvent.keyCode + "(" + oEvent.which + ")");
+  }
+
+  document.dispatchEvent(oEvent);
+}
+
+/**
+ * Action when a picker button is clicked
+ */
+var insertPoints = (value, storyOrPost, event) => {
+  event.stopPropagation();
+
+  var titleField = document.querySelector('.js-card-detail-title-input');
+
+  titleField.click();
+  titleField.focus();
+
+  // Remove old points
+  if (storyOrPost === 'story') {
+    var storyPointsForTitle = calculateStoryPointsForTitle(titleField.value);
+    var cleanedTitle = titleField.value.replace(storyPointsRegexp, '').trim();
+    titleField.value = '(' + value + ') ' + cleanedTitle;
+  }
+  else {
+    var postPointsForTitle = calculatePostPointsForTitle(titleField.value);
+    var cleanedTitle = titleField.value.replace(postPointsRegexp, '').trim();
+    titleField.value = '[' + value + '] ' + cleanedTitle;
+  }
+
+  Podium.keydown(13);
+
+  // Hide controls
+  document.querySelector('.scrummer-picker-container').parentNode.removeChild(document.querySelector('.scrummer-picker-container'));
 }
 
 var checkForLists = function () {
   if (document.querySelectorAll('.list').length > 0) {
     calculatePointsForBoard();
 
-    setupWindowListener(function () {
-      if (document.querySelector('.scrummer-picker-container')) {
-        return;
-      }
-
-      var editControls = document.querySelector('.js-current-list');
-
-      editControls.insertBefore(buildPicker(['?'].concat(pointsScale.split(',')), function (value, storyOrPost, e) {
-        e.stopPropagation();
-
-        var titleField = document.querySelector('.js-card-detail-title-input');
-
-        titleField.click();
-        titleField.focus();
-
-        // Remove old points
-        if (storyOrPost === 'story') {
-          var storyPointsForTitle = calculateStoryPointsForTitle(titleField.value);
-          var cleanedTitle = titleField.value.replace('(' + storyPointsForTitle + ')', '').trim();
-          titleField.value = '(' + value + ') ' + cleanedTitle;
-        }
-        else {
-          var postPointsForTitle = calculatePostPointsForTitle(titleField.value);
-          var cleanedTitle = titleField.value.replace('[' + postPointsForTitle + ']', '').trim();
-          titleField.value = '[' + value + '] ' + cleanedTitle;
+    if (settings.showPicker) {
+      setupWindowListener(function () {
+        if (document.querySelector('.scrummer-picker-container')) {
+          return;
         }
 
-        Podium.keydown(13);
-
-        // Hide controls
-        document.querySelector('.scrummer-picker-container').parentNode.removeChild(document.querySelector('.scrummer-picker-container'));
-      }), editControls.firstChild);
-    });
+        var editControls = document.querySelector('.js-current-list');
+        editControls.insertBefore(buildPicker(), editControls.firstChild);
+      });
+    }
   } else {
     setTimeout(checkForLists, 300);
   }
 }
 
-// Launch the plugin by checking at a certain interval if any lists have been loaded.
-// Wait 1 second because some DOM rebuilding may happen late.
-setTimeout(checkForLists, 1000);
+var settings = {};
+chrome.storage.sync.get(null, (_settings) => {
+  ['showCardNumbers', 'showStoryPoints', 'showPostPoints', 'showColumnTotals', 'showBoardTotals', 'showPicker']
+  .forEach((option) => {
+    if (_settings[option] === undefined) _settings[option] = true;
+  });
+  settings = _settings;
+
+  // Launch the plugin by checking at a certain interval if any lists have been loaded.
+  // Wait 1 second because some DOM rebuilding may happen late.
+  setTimeout(checkForLists, 1000);
+});

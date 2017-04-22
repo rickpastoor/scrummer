@@ -10,10 +10,17 @@
 			"css": ["scrummer.css"]
 		}
 	],
+	"permissions": [
+    "storage"
+  ],
 	"manifest_version" : 2,
-	"icons": {
-		"48": "img/icon48.png",
-		"128": "img/icon128.png",
-		"1024": "img/icon1024.png"
-	}
+	"browser_action": {
+    "default_icon": {
+			"48": "img/icon48.png",
+			"128": "img/icon128.png",
+			"1024": "img/icon1024.png"
+    },
+    "default_title": "ScrummerTheodo",
+    "default_popup": "popup.html"
+  }
 }
