@@ -1,32 +1,32 @@
-var pointsScale = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100];
-var storyPointsRegexp = /\((\?|\d+\.?,?\d*)\)/m;
-var postPointsRegexp = /\[(\?|\d+\.?,?\d*)\]/m;
+const POINTS_SCALE = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100];
+const STORY_POINTS_REGEXP = /\((\?|\d+\.?,?\d*)\)/m;
+const POST_POINTS_REGEXP = /\[(\?|\d+\.?,?\d*)\]/m;
 
-var debounceTimeout;
+let debounceTimeout;
 
-var debounce = function(func, wait, immediate) {
-  return function() {
-    var context = this, args = arguments;
-    var later = function() {
+const debounce = (func, wait, immediate) => {
+  return () => {
+    let context = this, args = arguments;
+    const later = () => {
       debounceTimeout = null;
       if (!immediate) func.apply(context, args);
     };
-    var callNow = immediate && !debounceTimeout;
+    let callNow = immediate && !debounceTimeout;
     clearTimeout(debounceTimeout);
     debounceTimeout = setTimeout(later, wait);
     if (callNow) func.apply(context, args);
   };
 };
 
-var containsNodeWithClass = function (nodeList, className) {
-  for (var i = 0; i < nodeList.length; i++) {
+const containsNodeWithClass = (nodeList, className) => {
+  for (let i = 0; i < nodeList.length; i++) {
     if (nodeList[i].classList && nodeList[i].classList.contains(className)) {
       return true;
     }
   }
 }
 
-var listChangeObserver = new MutationObserver(function (mutations) {
+let listChangeObserver = new MutationObserver(function (mutations) {
   mutations.forEach(function (mutation) {
     // if the mutation was triggered by us adding or removing badges, do not recalculate
     if (
@@ -54,59 +54,58 @@ var listChangeObserver = new MutationObserver(function (mutations) {
   });
 });
 
-var findOrInsertSpan = function(parent, className, insertBeforeClass) {
-  var span = parent.querySelector('.' + className);
+const findOrInsertSpan = (parent, className, insertBeforeElement) => {
+  let span = parent.querySelector('.' + className);
   if (!span) {
     span = document.createElement('span');
     span.className = className;
-    var insertBeforeElement = (insertBeforeClass ? parent.querySelector('.' + insertBeforeClass) : parent.firstChild);
     parent.insertBefore(span, insertBeforeElement);
   }
   return span;
 }
 
-var removeIfExists = function(parent, className) {
-  var element = parent.querySelector('.' + className);
+const removeIfExists = (parent, className) => {
+  let element = parent.querySelector('.' + className);
   if (element) {
     element.parentNode.removeChild(element);
   }
 }
 
-var calculateStoryPointsForTitle = function (title) {
+const calculateStoryPointsForTitle = (title) => {
   if (!settings.showStoryPoints) return;
-  var matches = title.match(storyPointsRegexp);
+  let matches = title.match(STORY_POINTS_REGEXP);
   if (matches) {
-    var points = matches[1];
+    let points = matches[1];
     if (points === '?') return '?';
     return parseFloat(points.replace(',','.'));
   }
 }
 
-var calculatePostPointsForTitle = function (title) {
+const calculatePostPointsForTitle = (title) => {
   if (!settings.showPostPoints) return;
-  var matches = title.match(postPointsRegexp);
+  let matches = title.match(POST_POINTS_REGEXP);
   if (matches) {
-    var points = matches[1];
+    let points = matches[1];
     if (points === '?') return '?';
     return parseFloat(points.replace(',','.'));
   }
 }
 
-var sanitizePoints = function (points) {
+const sanitizePoints = (points) => {
   if (points === '?') return 0;
   if (!points) return 0;
   return points;
 }
 
-var formatPoints = function (points) {
+const formatPoints = (points) => {
   if (points === '?') return '?';
   return Math.round(points * 10) / 10;
 }
 
-var calculatePointsForCard = function (card) {
-  var contentMutated = false;
+const calculatePointsForCard = (card) => {
+  let contentMutated = false;
 
-  var cardNameElement = card.querySelector('.js-card-name');
+  let cardNameElement = card.querySelector('.js-card-name');
   if (!cardNameElement) {
     return {
       story: 0,
@@ -114,12 +113,11 @@ var calculatePointsForCard = function (card) {
     };
   }
 
-  var originalTitle = card.getAttribute('data-original-title');
+  let originalTitle = card.getAttribute('data-original-title');
 
-  if (settings.showCardNumbers) {
-    var cardShortId = cardNameElement.querySelector('.card-short-id');
-    var cardIdElement = findOrInsertSpan(cardNameElement, 'scrummer-card-id');
-    cardIdElement.textContent = cardShortId.textContent;
+  let cardShortId = cardNameElement.querySelector('.card-short-id');
+  if (settings.showCardNumbers && !cardShortId.classList.contains('scrummer-card-id')) {
+    cardShortId.classList.add('scrummer-card-id');
   }
 
   if (!originalTitle || cardNameElement.getAttribute('data-mutated') == 1) {
@@ -144,8 +142,8 @@ var calculatePointsForCard = function (card) {
     };
   }
 
-  var calculatedPoints = calculateStoryPointsForTitle(originalTitle);
-  var calculatedPostPoints = calculatePostPointsForTitle(originalTitle);
+  let calculatedPoints = calculateStoryPointsForTitle(originalTitle);
+  let calculatedPostPoints = calculatePostPointsForTitle(originalTitle);
 
   if (
     !contentMutated &&
@@ -159,7 +157,7 @@ var calculatePointsForCard = function (card) {
   }
 
   if (calculatedPoints !== undefined) {
-    var badgeElement = findOrInsertSpan(cardNameElement, 'scrummer-points', 'card-short-id');
+    let badgeElement = findOrInsertSpan(cardNameElement, 'scrummer-points', cardNameElement.lastChild);
     badgeElement.textContent = formatPoints(calculatedPoints);
     card.setAttribute('data-calculated-points', calculatedPoints);
   } else {
@@ -167,16 +165,16 @@ var calculatePointsForCard = function (card) {
   }
 
   if (calculatedPostPoints !== undefined) {
-    var badgeElement = findOrInsertSpan(cardNameElement, 'scrummer-post-points', 'card-short-id');
+    let badgeElement = findOrInsertSpan(cardNameElement, 'scrummer-post-points', cardNameElement.lastChild);
     badgeElement.textContent = formatPoints(calculatedPostPoints);
     card.setAttribute('data-calculated-post-points', calculatedPostPoints);
   } else {
     removeIfExists(cardNameElement, 'scrummer-post-points');
   }
 
-  var cleanedTitle = originalTitle;
-  if (settings.showStoryPoints) cleanedTitle = cleanedTitle.replace(storyPointsRegexp, '');
-  if (settings.showPostPoints)  cleanedTitle = cleanedTitle.replace(postPointsRegexp, '');
+  let cleanedTitle = originalTitle;
+  if (settings.showStoryPoints) cleanedTitle = cleanedTitle.replace(STORY_POINTS_REGEXP, '');
+  if (settings.showPostPoints)  cleanedTitle = cleanedTitle.replace(POST_POINTS_REGEXP, '');
   cardNameElement.lastChild.textContent = cleanedTitle.trim();
 
   return {
@@ -185,7 +183,7 @@ var calculatePointsForCard = function (card) {
   };
 }
 
-var calculatePointsForList = function (list) {
+const calculatePointsForList = (list) => {
   listChangeObserver.observe(list, {
     childList: true,
     characterData: false,
@@ -197,23 +195,23 @@ var calculatePointsForList = function (list) {
   });
 
   // Array.slice can convert a NodeList to an array
-  var listPoints = Array.prototype.slice.call(list.querySelectorAll('.list-card:not(.hide)'))
+  let listPoints = Array.prototype.slice.call(list.querySelectorAll('.list-card:not(.hide)'))
   .reduce((listPoints, list) => {
-    var cardPoints = calculatePointsForCard(list);
+    let cardPoints = calculatePointsForCard(list);
     listPoints.story += cardPoints.story;
     listPoints.post += cardPoints.post;
     return listPoints;
   }, { story: 0, post: 0 });
 
-  var listHeader = null;
+  let listHeader = null;
   if (settings.showColumnTotals && (listHeader = list.querySelector('.js-list-header'))) {
     // Add or update points badges
     if (settings.showStoryPoints) {
-      var badge = findOrInsertSpan(listHeader, 'scrummer-list-points', 'js-list-name-input');
+      let badge = findOrInsertSpan(listHeader, 'scrummer-list-points', listHeader.querySelector('.js-list-name-input'));
       badge.textContent = formatPoints(listPoints.story);
     }
     if (settings.showPostPoints) {
-      var badge = findOrInsertSpan(listHeader, 'scrummer-list-post-points', 'js-list-name-input');
+      let badge = findOrInsertSpan(listHeader, 'scrummer-list-post-points', listHeader.querySelector('.js-list-name-input'));
       badge.textContent = formatPoints(listPoints.post);
     }
   }
@@ -221,26 +219,25 @@ var calculatePointsForList = function (list) {
   return listPoints;
 }
 
-var calculatePointsForBoard = function () {
-
+const calculatePointsForBoard = () => {
   // Array.slice can convert a NodeList to an array
-  var boardPoints = Array.prototype.slice.call(document.querySelectorAll('.list'))
+  let boardPoints = Array.prototype.slice.call(document.querySelectorAll('.list'))
   .reduce((boardPoints, list) => {
-    var listPoints = calculatePointsForList(list);
+    let listPoints = calculatePointsForList(list);
     boardPoints.story += listPoints.story;
     boardPoints.post += listPoints.post;
     return boardPoints;
   }, { story: 0, post: 0 });
 
-  var boardHeader = null;
+  let boardHeader = null;
   if (settings.showBoardTotals && (boardHeader = document.querySelector('.js-board-header'))) {
     // Add or update points badges
     if (settings.showStoryPoints) {
-      var badge = findOrInsertSpan(boardHeader, 'scrummer-board-points', 'board-header-btn-name');
+      let badge = findOrInsertSpan(boardHeader, 'scrummer-board-points', boardHeader.querySelector('.board-header-btn-name'));
       badge.textContent = formatPoints(boardPoints.story);
     }
     if (settings.showPostPoints) {
-      var badge = findOrInsertSpan(boardHeader, 'scrummer-board-post-points', 'board-header-btn-name');
+      let badge = findOrInsertSpan(boardHeader, 'scrummer-board-post-points', boardHeader.querySelector('.board-header-btn-name'));
       badge.textContent = formatPoints(boardPoints.post);
     }
   }
@@ -252,16 +249,16 @@ var calculatePointsForBoard = function () {
   });
 }
 
-var calculatePointsForBoardDebounced = function () {
+const calculatePointsForBoardDebounced = () => {
   debounce(calculatePointsForBoard, 100)();
 }
 
-var buildPickerRow = (storyOrPost) => {
-  var row = document.createElement('div');
+const buildPickerRow = (storyOrPost) => {
+  let row = document.createElement('div');
   row.className = 'scrummer-picker-row';
 
-  pointsScale.forEach(function (value) {
-    var button = document.createElement('a');
+  POINTS_SCALE.forEach(function (value) {
+    let button = document.createElement('a');
     button.textContent = value;
     button.href = 'javascript:;';
 
@@ -276,8 +273,8 @@ var buildPickerRow = (storyOrPost) => {
 /**
  * The point picker
  */
-var buildPicker = function () {
-  var itemsContainer = document.createElement('div');
+const buildPicker = () => {
+  let itemsContainer = document.createElement('div');
   itemsContainer.className = 'scrummer-picker-container';
   if (settings.showStoryPoints) itemsContainer.appendChild(buildPickerRow('story'));
   if (settings.showPostPoints) itemsContainer.appendChild(buildPickerRow('post'));
@@ -288,8 +285,8 @@ var buildPicker = function () {
 /**
  * This sets up a listener to see if a detail window is presented
  */
-var setupWindowListener = function (callback) {
-  var windowChangeObserver = new MutationObserver(function (mutations) {
+const setupWindowListener = (callback) => {
+  let windowChangeObserver = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
       if (mutation.target.classList.contains('js-card-detail-title-input') &&
         mutation.target.classList.contains('is-editing')) {
@@ -309,7 +306,7 @@ var setupWindowListener = function (callback) {
 
 Podium = {};
 Podium.keydown = function(k) {
-  var oEvent = document.createEvent('KeyboardEvent');
+  let oEvent = document.createEvent('KeyboardEvent');
 
   // Chromium Hack
   Object.defineProperty(oEvent, 'keyCode', {
@@ -341,23 +338,21 @@ Podium.keydown = function(k) {
 /**
  * Action when a picker button is clicked
  */
-var insertPoints = (value, storyOrPost, event) => {
+const insertPoints = (value, storyOrPost, event) => {
   event.stopPropagation();
 
-  var titleField = document.querySelector('.js-card-detail-title-input');
+  let titleField = document.querySelector('.js-card-detail-title-input');
 
   titleField.click();
   titleField.focus();
 
   // Remove old points
   if (storyOrPost === 'story') {
-    var storyPointsForTitle = calculateStoryPointsForTitle(titleField.value);
-    var cleanedTitle = titleField.value.replace(storyPointsRegexp, '').trim();
+    let cleanedTitle = titleField.value.replace(STORY_POINTS_REGEXP, '').trim();
     titleField.value = '(' + value + ') ' + cleanedTitle;
   }
   else {
-    var postPointsForTitle = calculatePostPointsForTitle(titleField.value);
-    var cleanedTitle = titleField.value.replace(postPointsRegexp, '').trim();
+    let cleanedTitle = titleField.value.replace(POST_POINTS_REGEXP, '').trim();
     titleField.value = '[' + value + '] ' + cleanedTitle;
   }
 
@@ -367,7 +362,7 @@ var insertPoints = (value, storyOrPost, event) => {
   document.querySelector('.scrummer-picker-container').parentNode.removeChild(document.querySelector('.scrummer-picker-container'));
 }
 
-var checkForLists = function () {
+const checkForLists = () => {
   if (document.querySelectorAll('.list').length > 0) {
     calculatePointsForBoard();
 
@@ -377,7 +372,7 @@ var checkForLists = function () {
           return;
         }
 
-        var editControls = document.querySelector('.js-current-list');
+        let editControls = document.querySelector('.js-current-list');
         editControls.insertBefore(buildPicker(), editControls.firstChild);
       });
     }
@@ -386,7 +381,7 @@ var checkForLists = function () {
   }
 }
 
-var settings = {};
+let settings = {};
 chrome.storage.sync.get(null, (_settings) => {
   ['showCardNumbers', 'showStoryPoints', 'showPostPoints', 'showColumnTotals', 'showBoardTotals', 'showPicker']
   .forEach((option) => {

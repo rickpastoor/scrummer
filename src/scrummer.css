@@ -70,6 +70,10 @@ textarea.mod-list-name.list-header-name {
   color: #ccc !important;
 }
 
+.scrummer-card-id.hide {
+  display: inline;
+}
+
 .scrummer-card-id::after {
   content: ' ';
 }
