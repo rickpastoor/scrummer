@@ -5,7 +5,7 @@ const POST_POINTS_REGEXP = /\[(\?|\d+\.?,?\d*)\]/m;
 let debounceTimeout;
 
 const debounce = (func, wait, immediate) => {
-  return () => {
+  return function () {
     let context = this, args = arguments;
     const later = () => {
       debounceTimeout = null;
