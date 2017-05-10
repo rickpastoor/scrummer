@@ -4,17 +4,17 @@
 
 source ./config
 
-echo "*** scrummer(Firefox-WebExt): Creating package"
-echo "*** scrummer(Firefox-WebExt): Copying files"
+echo "*** scrummer.firefox: Creating package"
+echo "*** scrummer.firefox: Copying files"
 
-DES=./dist/build/scrummer.firefox-webext
+DES=./dist/build/scrummer.firefox
 rm -rf $DES
 mkdir -p $DES
 mkdir -p $DES/img/
 
 cp -R ./src/*                           $DES/
-cp -R ./platform/firefox-webext/img/*         $DES/img/
-cp    ./platform/firefox-webext/manifest.json $DES/
+cp -R ./platform/firefox/img/*         $DES/img/
+cp    ./platform/firefox/manifest.json $DES/
 
 # Replace version
 sed -i.bak 's/SCRUMMER_VERSION/'$SCRUMMER_VERSION'/g' $DES/manifest.json
@@ -27,11 +27,11 @@ rm $DES/scrummer.js.bak
 rm $DES/settings.js.bak
 
 if [ "$1" = all ]; then
-    echo "*** scrummer.firefox-webext: Creating package..."
+    echo "*** scrummer.firefox: Creating package..."
     pushd $DES
-    zip scrummer.firefox-webext.zip -qr *
-    mv scrummer.firefox-webext.zip ..
+    zip scrummer.firefox.zip -qr *
+    mv scrummer.firefox.zip ..
     popd
 fi
 
-echo "*** scrummer(Firefox-WebExt): Package done."
+echo "*** scrummer.firefox: Package done."
