@@ -4,28 +4,34 @@
 
 source ./config
 
+echo "*** scrummer.firefox: Creating package"
 echo "*** scrummer.firefox: Copying files"
 
-DES=dist/build/scrummer.firefox
+DES=./dist/build/scrummer.firefox
 rm -rf $DES
 mkdir -p $DES
-mkdir -p $DES/data
+mkdir -p $DES/img/
 
-cp -R src/*                             $DES/data
-cp    platform/firefox/index.js         $DES/
-cp    platform/firefox/package.json     $DES/
-cp -R platform/chromium/img             $DES/
-mv    $DES/img/icon128.png              $DES/icon.png
+cp -R ./src/*                           $DES/
+cp -R ./platform/firefox/img/*         $DES/img/
+cp    ./platform/firefox/manifest.json $DES/
 
 # Replace version
-sed -i.bak 's/SCRUMMER_VERSION/'$SCRUMMER_VERSION'/g' $DES/package.json
-rm $DES/package.json.bak
+sed -i.bak 's/SCRUMMER_VERSION/'$SCRUMMER_VERSION'/g' $DES/manifest.json
+rm $DES/manifest.json.bak
+
+# Replace chrome.storage by browser.storage
+sed -i.bak 's/chrome\.storage/browser\.storage/g' $DES/scrummer.js
+sed -i.bak 's/chrome\.storage/browser\.storage/g' $DES/settings.js
+rm $DES/scrummer.js.bak
+rm $DES/settings.js.bak
 
 if [ "$1" = all ]; then
     echo "*** scrummer.firefox: Creating package..."
-    pushd $DES/
-    jpm xpi
-    mv ./scrummer.xpi ./../scrummer.firefox.xpi
+    pushd $DES
+    zip scrummer.firefox.zip -qr *
+    mv scrummer.firefox.zip ..
+    popd
 fi
 
 echo "*** scrummer.firefox: Package done."

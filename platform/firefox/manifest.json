@@ -1,0 +1,38 @@
+{
+  "name": "ScrummerTheodo",
+  "version": "SCRUMMER_VERSION",
+  "description": "Adds story points, post-estimation points and card ID to Trello",
+  "content_scripts": [
+    {
+      "run_at": "document_end",
+      "matches": [
+        "https://trello.com/*"
+      ],
+      "js": [
+        "scrummer.js"
+      ],
+      "css": [
+        "scrummer.css"
+      ]
+    }
+  ],
+  "permissions": [
+    "storage"
+  ],
+  "manifest_version": 2,
+  "browser_action": {
+    "default_icon": {
+      "48": "img/icon48.png",
+      "128": "img/icon128.png",
+      "1024": "img/icon1024.png"
+    },
+    "default_title": "ScrummerTheodo",
+    "default_popup": "popup.html"
+  },
+  "applications": {
+    "gecko": {
+      "id": "scrummertheodo@theodo.fr",
+      "strict_min_version": "48.0"
+    }
+  }
+}
