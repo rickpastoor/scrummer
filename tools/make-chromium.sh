@@ -4,7 +4,6 @@
 
 source ./config
 
-echo "*** scrummer(Chromium): Creating package"
 echo "*** scrummer(Chromium): Copying files"
 
 DES=./dist/build/scrummer.chromium
