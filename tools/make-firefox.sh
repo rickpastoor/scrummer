@@ -21,9 +21,8 @@ rm $DES/manifest.json.bak
 
 if [ "$1" = all ]; then
     echo "*** scrummer.firefox: Creating package..."
-    pushd $(dirname $DES/)
-    zip scrummer.firefox.xpi -qr $(basename $DES/)
-    popd
+    cd $DES
+    zip ../scrummer.firefox.zip -qr ./*
 fi
 
 echo "*** scrummer.firefox: Package done."
