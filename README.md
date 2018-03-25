@@ -1,3 +1,10 @@
+# ScrummerTheodo
+
+This is my fork of rickpastoor's [Scrummer](https://github.com/rickpastoor/scrummer).
+Below is the original readme for Scrummer.
+
+---
+
 # Scrummer [![Build Status](https://travis-ci.org/rickpastoor/scrummer.svg?branch=master)](https://travis-ci.org/rickpastoor/scrummer)
 
 [Download Scrummer for Google Chrome](https://chrome.google.com/webstore/detail/scrummer/pmoipljemkkfadmmoenedgfepbefafnp)

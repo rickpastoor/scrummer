@@ -151,8 +151,8 @@ const calculatePointsForCard = (card) => {
     card.getAttribute('data-calculated-post-points') == calculatedPostPoints
   ) {
     return {
-      story: calculatedPoints || 0,
-      post: calculatedPostPoints || 0
+      story: sanitizePoints(calculatedPoints),
+      post: sanitizePoints(calculatedPostPoints)
     }
   }
 
@@ -196,8 +196,8 @@ const calculatePointsForList = (list) => {
 
   // Array.slice can convert a NodeList to an array
   let listPoints = Array.prototype.slice.call(list.querySelectorAll('.list-card:not(.hide)'))
-  .reduce((listPoints, list) => {
-    let cardPoints = calculatePointsForCard(list);
+  .reduce((listPoints, card) => {
+    let cardPoints = calculatePointsForCard(card);
     listPoints.story += cardPoints.story;
     listPoints.post += cardPoints.post;
     return listPoints;
