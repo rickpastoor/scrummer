@@ -116,7 +116,7 @@ const calculatePointsForCard = (card) => {
   let originalTitle = card.getAttribute('data-original-title');
 
   let cardShortId = cardNameElement.querySelector('.card-short-id');
-  if (settings.showCardNumbers && !cardShortId.classList.contains('scrummer-card-id')) {
+  if (settings.showCardNumbers && cardShortId && !cardShortId.classList.contains('scrummer-card-id')) {
     cardShortId.classList.add('scrummer-card-id');
   }
 
