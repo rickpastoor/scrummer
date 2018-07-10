@@ -74,6 +74,11 @@ textarea.mod-list-name.list-header-name {
   display: inline;
 }
 
-.scrummer-card-id::after {
-  content: ' ';
+.scrummer-card-id {
+  background-color: #ffdd00;
+  border: 1px solid #ffdd00;
+  margin-right: 3px;
+  padding: 0px 3px;
+  border-radius: 5px;
 }
+
