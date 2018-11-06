@@ -39,8 +39,8 @@ let listChangeObserver = new MutationObserver(function (mutations) {
 
     // If the list was modified, recalculate
     if (mutation.target.classList.contains('list-cards') ||
-        mutation.target.classList.contains('list-header-num-cards') ||
-        mutation.target.classList.contains('js-list-sortable')) {
+      mutation.target.classList.contains('list-header-num-cards') ||
+      mutation.target.classList.contains('js-list-sortable')) {
       setTimeout(calculatePointsForBoardDebounced);
       return;
     }
@@ -77,7 +77,7 @@ const calculateStoryPointsForTitle = (title) => {
   if (matches) {
     let points = matches[1];
     if (points === '?') return '?';
-    return parseFloat(points.replace(',','.'));
+    return parseFloat(points.replace(',', '.'));
   }
 }
 
@@ -87,7 +87,7 @@ const calculatePostPointsForTitle = (title) => {
   if (matches) {
     let points = matches[1];
     if (points === '?') return '?';
-    return parseFloat(points.replace(',','.'));
+    return parseFloat(points.replace(',', '.'));
   }
 }
 
@@ -174,7 +174,7 @@ const calculatePointsForCard = (card) => {
 
   let cleanedTitle = originalTitle;
   if (settings.showStoryPoints) cleanedTitle = cleanedTitle.replace(STORY_POINTS_REGEXP, '');
-  if (settings.showPostPoints)  cleanedTitle = cleanedTitle.replace(POST_POINTS_REGEXP, '');
+  if (settings.showPostPoints) cleanedTitle = cleanedTitle.replace(POST_POINTS_REGEXP, '');
   cardNameElement.lastChild.textContent = cleanedTitle.trim();
 
   return {
@@ -196,12 +196,12 @@ const calculatePointsForList = (list) => {
 
   // Array.slice can convert a NodeList to an array
   let listPoints = Array.prototype.slice.call(list.querySelectorAll('.list-card:not(.hide)'))
-  .reduce((listPoints, card) => {
-    let cardPoints = calculatePointsForCard(card);
-    listPoints.story += cardPoints.story;
-    listPoints.post += cardPoints.post;
-    return listPoints;
-  }, { story: 0, post: 0 });
+    .reduce((listPoints, card) => {
+      let cardPoints = calculatePointsForCard(card);
+      listPoints.story += cardPoints.story;
+      listPoints.post += cardPoints.post;
+      return listPoints;
+    }, { story: 0, post: 0 });
 
   let listHeader = null;
   if (settings.showColumnTotals && (listHeader = list.querySelector('.js-list-header'))) {
@@ -222,12 +222,12 @@ const calculatePointsForList = (list) => {
 const calculatePointsForBoard = () => {
   // Array.slice can convert a NodeList to an array
   let boardPoints = Array.prototype.slice.call(document.querySelectorAll('.list'))
-  .reduce((boardPoints, list) => {
-    let listPoints = calculatePointsForList(list);
-    boardPoints.story += listPoints.story;
-    boardPoints.post += listPoints.post;
-    return boardPoints;
-  }, { story: 0, post: 0 });
+    .reduce((boardPoints, list) => {
+      let listPoints = calculatePointsForList(list);
+      boardPoints.story += listPoints.story;
+      boardPoints.post += listPoints.post;
+      return boardPoints;
+    }, { story: 0, post: 0 });
 
   let boardHeader = null;
   if (settings.showBoardTotals && (boardHeader = document.querySelector('.js-board-header'))) {
@@ -305,17 +305,17 @@ const setupWindowListener = (callback) => {
 }
 
 Podium = {};
-Podium.keydown = function(k) {
+Podium.keydown = function (k) {
   let oEvent = document.createEvent('KeyboardEvent');
 
   // Chromium Hack
   Object.defineProperty(oEvent, 'keyCode', {
-    get: function() {
+    get: function () {
       return this.keyCodeVal;
     }
   });
   Object.defineProperty(oEvent, 'which', {
-    get: function() {
+    get: function () {
       return this.keyCodeVal;
     }
   });
@@ -384,9 +384,9 @@ const checkForLists = () => {
 let settings = {};
 chrome.storage.sync.get(null, (_settings) => {
   ['showCardNumbers', 'showStoryPoints', 'showPostPoints', 'showColumnTotals', 'showBoardTotals', 'showPicker']
-  .forEach((option) => {
-    if (_settings[option] === undefined) _settings[option] = true;
-  });
+    .forEach((option) => {
+      if (_settings[option] === undefined) _settings[option] = true;
+    });
   settings = _settings;
 
   // Launch the plugin by checking at a certain interval if any lists have been loaded.
