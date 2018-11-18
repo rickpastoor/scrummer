@@ -21,6 +21,13 @@ const getTitleDataConfiguration = settings => ({
   },
 });
 
+const getDefaultValueFromConfig = (titleDataConfiguration) => {
+  const defaultValue = {};
+  for (const dataIdentifier in titleDataConfiguration) {
+    defaultValue[dataIdentifier] = titleDataConfiguration[dataIdentifier].defaultValue
+  }
+}
+
 const containsNodeWithClass = (nodeList, className) => {
   for (let i = 0; i < nodeList.length; i++) {
     if (nodeList[i].classList && nodeList[i].classList.contains(className)) {
@@ -97,13 +104,11 @@ const formatPoints = (points) => {
 
 const calculatePointsForCard = (card) => {
   let contentMutated = false;
+  const titleDataConfiguration = getTitleDataConfiguration(settings)
 
   let cardNameElement = card.querySelector('.js-card-name');
   if (!cardNameElement) {
-    return {
-      story: 0,
-      post: 0
-    };
+    return getDefaultValueFromConfig(titleDataConfiguration)
   }
 
   let originalTitle = card.getAttribute('data-original-title');
@@ -129,13 +134,9 @@ const calculatePointsForCard = (card) => {
   }
 
   if (!originalTitle) {
-    return {
-      story: 0,
-      post: 0
-    };
+    return getDefaultValueFromConfig(titleDataConfiguration)
   }
 
-  const titleDataConfiguration = getTitleDataConfiguration(settings)
   const storyPointsConfiguration = titleDataConfiguration.story
   let calculatedPoints = extractDataFromTitle(
     originalTitle,
