@@ -97,6 +97,15 @@ const sanitizePoints = (points) => {
   return points;
 }
 
+const sanitizeExtractedDataIndex = (extractedDataIndex) => {
+  const sanitizedIndex = {}
+  for (const dataIdentifier in extractedDataIndex) {
+    sanitizedIndex[dataIdentifier] = sanitizePoints(extractedDataIndex[dataIdentifier])
+  }
+
+  return sanitizedIndex
+}
+
 const formatPoints = (points) => {
   if (points === '?') return '?';
   return Math.round(points * 10) / 10;
@@ -125,56 +134,38 @@ const calculatePointsForCard = (card) => {
     contentMutated = true;
   }
 
-  // Trello sometimes drops our badge, so if that happens we need to redraw
-  if (card.getAttribute('data-calculated-points') !== null && !card.querySelector('.scrummer-points')) {
-    contentMutated = true;
-  }
-  if (card.getAttribute('data-calculated-post-points') !== null && !card.querySelector('.scrummer-post-points')) {
-    contentMutated = true;
-  }
-
   if (!originalTitle) {
     return getDefaultValueFromConfig(titleDataConfiguration)
   }
 
-  const storyPointsConfiguration = titleDataConfiguration.story
-  let calculatedPoints = extractDataFromTitle(
-    originalTitle,
-    storyPointsConfiguration.isActivated,
-    storyPointsConfiguration.regex
-  );
-  const postPointsConfiguration = titleDataConfiguration.post
-  let calculatedPostPoints = extractDataFromTitle(
-    originalTitle,
-    postPointsConfiguration.isActivated,
-    postPointsConfiguration.regex
-  );
+  const extractedDataIndex = {}
+  for (const dataIdentifier in titleDataConfiguration) {
+    const { isActivated, regex, attribute, cssClass } = titleDataConfiguration[dataIdentifier];
 
-  if (
-    !contentMutated &&
-    card.getAttribute('data-calculated-points') == calculatedPoints &&
-    card.getAttribute('data-calculated-post-points') == calculatedPostPoints
-  ) {
-    return {
-      story: sanitizePoints(calculatedPoints),
-      post: sanitizePoints(calculatedPostPoints)
+    const extractedData = extractDataFromTitle(originalTitle, isActivated, regex)
+    extractedDataIndex[dataIdentifier] = extractedData
+
+    // Trello sometimes drops our badge, so if that happens we need to redraw
+    if (card.getAttribute(attribute) !== null && !card.querySelector(cssClass)) {
+      contentMutated = true;
+    }
+    if (card.getAttribute(attribute) !== extractedData) {
+      contentMutated = true;
     }
   }
 
-  if (calculatedPoints !== undefined) {
-    let badgeElement = findOrInsertSpan(cardNameElement, 'scrummer-points', cardNameElement.lastChild);
-    badgeElement.textContent = formatPoints(calculatedPoints);
-    card.setAttribute('data-calculated-points', calculatedPoints);
-  } else {
-    removeIfExists(cardNameElement, 'scrummer-points');
-  }
+  if (!contentMutated) { return sanitizeExtractedDataIndex(extractedDataIndex) }
 
-  if (calculatedPostPoints !== undefined) {
-    let badgeElement = findOrInsertSpan(cardNameElement, 'scrummer-post-points', cardNameElement.lastChild);
-    badgeElement.textContent = formatPoints(calculatedPostPoints);
-    card.setAttribute('data-calculated-post-points', calculatedPostPoints);
-  } else {
-    removeIfExists(cardNameElement, 'scrummer-post-points');
+  for (const dataIdentifier in extractedDataIndex) {
+    const extractedData = extractedDataIndex[dataIdentifier]
+    const { attribute, cssClass } = titleDataConfiguration[dataIdentifier];
+    if (extractedData !== undefined) {
+      const badgeElement = findOrInsertSpan(cardNameElement, cssClass, cardNameElement.lastChild);
+      badgeElement.textContent = formatPoints(extractedData);
+      card.setAttribute(attribute, extractedData);
+    } else {
+      removeIfExists(cardNameElement, cssClass);
+    }
   }
 
   let cleanedTitle = originalTitle;
@@ -182,10 +173,7 @@ const calculatePointsForCard = (card) => {
   if (settings.showPostPoints) cleanedTitle = cleanedTitle.replace(titleDataConfiguration.post.regex, '');
   cardNameElement.lastChild.textContent = cleanedTitle.trim();
 
-  return {
-    story: sanitizePoints(calculatedPoints),
-    post: sanitizePoints(calculatedPostPoints)
-  };
+  return sanitizeExtractedDataIndex(extractedDataIndex)
 }
 
 const calculatePointsForList = (list) => {
