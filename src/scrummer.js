@@ -1,6 +1,21 @@
 const POINTS_SCALE = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100];
-const STORY_POINTS_REGEXP = /\((\?|\d+\.?,?\d*)\)/m;
-const POST_POINTS_REGEXP = /\[(\?|\d+\.?,?\d*)\]/m;
+
+const titleDataConfiguration = {
+  story: {
+    attribute: 'data-calculated-points',
+    cssClass: 'scrummer-points',
+    isActivated: settings.showStoryPoints,
+    regex: /\((\?|\d+\.?,?\d*)\)/m,
+    defaultValue: 0
+  },
+  post: {
+    attribute: 'data-calculated-post-points',
+    cssClass: 'scrummer-post-points',
+    isActivated: settings.showPostPoints,
+    regex: /\[(\?|\d+\.?,?\d*)\]/m,
+    defaultValue: 0
+  },
+};
 
 let debounceTimeout;
 
@@ -71,19 +86,9 @@ const removeIfExists = (parent, className) => {
   }
 }
 
-const calculateStoryPointsForTitle = (title) => {
-  if (!settings.showStoryPoints) return;
-  let matches = title.match(STORY_POINTS_REGEXP);
-  if (matches) {
-    let points = matches[1];
-    if (points === '?') return '?';
-    return parseFloat(points.replace(',', '.'));
-  }
-}
-
-const calculatePostPointsForTitle = (title) => {
-  if (!settings.showPostPoints) return;
-  let matches = title.match(POST_POINTS_REGEXP);
+const extractDataFromTitle = (isActivated, regex) => {
+  if (!isActivated) return;
+  let matches = title.match(regex);
   if (matches) {
     let points = matches[1];
     if (points === '?') return '?';
@@ -142,8 +147,17 @@ const calculatePointsForCard = (card) => {
     };
   }
 
-  let calculatedPoints = calculateStoryPointsForTitle(originalTitle);
-  let calculatedPostPoints = calculatePostPointsForTitle(originalTitle);
+
+  const storyPointsConfiguration = titleDataConfiguration.story
+  let calculatedPoints = extractDataFromTitle(
+    storyPointsConfiguration.isActivated,
+    storyPointsConfiguration.regex
+  );
+  const postPointsConfiguration = titleDataConfiguration.post
+  let calculatedPostPoints = extractDataFromTitle(
+    postPointsConfiguration.isActivated,
+    postPointsConfiguration.regex
+  );
 
   if (
     !contentMutated &&
@@ -173,8 +187,8 @@ const calculatePointsForCard = (card) => {
   }
 
   let cleanedTitle = originalTitle;
-  if (settings.showStoryPoints) cleanedTitle = cleanedTitle.replace(STORY_POINTS_REGEXP, '');
-  if (settings.showPostPoints) cleanedTitle = cleanedTitle.replace(POST_POINTS_REGEXP, '');
+  if (settings.showStoryPoints) cleanedTitle = cleanedTitle.replace(titleDataConfiguration.story.regex, '');
+  if (settings.showPostPoints) cleanedTitle = cleanedTitle.replace(titleDataConfiguration.post.regex, '');
   cardNameElement.lastChild.textContent = cleanedTitle.trim();
 
   return {
@@ -348,11 +362,11 @@ const insertPoints = (value, storyOrPost, event) => {
 
   // Remove old points
   if (storyOrPost === 'story') {
-    let cleanedTitle = titleField.value.replace(STORY_POINTS_REGEXP, '').trim();
+    let cleanedTitle = titleField.value.replace(titleDataConfiguration.story.regex, '').trim();
     titleField.value = '(' + value + ') ' + cleanedTitle;
   }
   else {
-    let cleanedTitle = titleField.value.replace(POST_POINTS_REGEXP, '').trim();
+    let cleanedTitle = titleField.value.replace(titleDataConfiguration.post.regex, '').trim();
     titleField.value = '[' + value + '] ' + cleanedTitle;
   }
 
