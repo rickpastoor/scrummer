@@ -1,37 +1,25 @@
 const POINTS_SCALE = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100];
 
-const titleDataConfiguration = {
+const getTitleDataConfiguration = settings => ({
   story: {
     attribute: 'data-calculated-points',
     cssClass: 'scrummer-points',
+    pickerClass: 'scrummer-picker-button',
     isActivated: settings.showStoryPoints,
     regex: /\((\?|\d+\.?,?\d*)\)/m,
+    delimiters: ['(', ')'],
     defaultValue: 0
   },
   post: {
     attribute: 'data-calculated-post-points',
     cssClass: 'scrummer-post-points',
+    pickerClass: 'scrummer-picker-post-button',
     isActivated: settings.showPostPoints,
     regex: /\[(\?|\d+\.?,?\d*)\]/m,
+    delimiters: ['[', ']'],
     defaultValue: 0
   },
-};
-
-let debounceTimeout;
-
-const debounce = (func, wait, immediate) => {
-  return function () {
-    let context = this, args = arguments;
-    const later = () => {
-      debounceTimeout = null;
-      if (!immediate) func.apply(context, args);
-    };
-    let callNow = immediate && !debounceTimeout;
-    clearTimeout(debounceTimeout);
-    debounceTimeout = setTimeout(later, wait);
-    if (callNow) func.apply(context, args);
-  };
-};
+});
 
 const containsNodeWithClass = (nodeList, className) => {
   for (let i = 0; i < nodeList.length; i++) {
@@ -86,9 +74,9 @@ const removeIfExists = (parent, className) => {
   }
 }
 
-const extractDataFromTitle = (isActivated, regex) => {
-  if (!isActivated) return;
-  let matches = title.match(regex);
+const extractDataFromTitle = (title, isDataActivated, regexMatchingData) => {
+  if (!isDataActivated) return;
+  let matches = title.match(regexMatchingData);
   if (matches) {
     let points = matches[1];
     if (points === '?') return '?';
@@ -147,14 +135,16 @@ const calculatePointsForCard = (card) => {
     };
   }
 
-
+  const titleDataConfiguration = getTitleDataConfiguration(settings)
   const storyPointsConfiguration = titleDataConfiguration.story
   let calculatedPoints = extractDataFromTitle(
+    originalTitle,
     storyPointsConfiguration.isActivated,
     storyPointsConfiguration.regex
   );
   const postPointsConfiguration = titleDataConfiguration.post
   let calculatedPostPoints = extractDataFromTitle(
+    originalTitle,
     postPointsConfiguration.isActivated,
     postPointsConfiguration.regex
   );
@@ -263,11 +253,27 @@ const calculatePointsForBoard = () => {
   });
 }
 
+let debounceTimeout;
+
+const debounce = (func, wait, immediate) => {
+  return function () {
+    let context = this, args = arguments;
+    const later = () => {
+      debounceTimeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    let callNow = immediate && !debounceTimeout;
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+};
+
 const calculatePointsForBoardDebounced = () => {
   debounce(calculatePointsForBoard, 100)();
 }
 
-const buildPickerRow = (storyOrPost) => {
+const buildPickerRow = (buttonClassnameF, regexMatchingDataInTitle, delimitersOfDataInTitle) => {
   let row = document.createElement('div');
   row.className = 'scrummer-picker-row';
 
@@ -275,9 +281,12 @@ const buildPickerRow = (storyOrPost) => {
     let button = document.createElement('a');
     button.textContent = value;
     button.href = 'javascript:;';
+    button.className = buttonClassnameF;
+    button.addEventListener(
+      'click',
+      insertDataInTitle.bind(this, value, regexMatchingDataInTitle, delimitersOfDataInTitle)
+    );
 
-    button.addEventListener('click', insertPoints.bind(this, value, storyOrPost));
-    button.className = storyOrPost === 'story' ? 'scrummer-picker-button' : 'scrummer-picker-post-button';
     row.appendChild(button);
   });
 
@@ -290,8 +299,15 @@ const buildPickerRow = (storyOrPost) => {
 const buildPicker = () => {
   let itemsContainer = document.createElement('div');
   itemsContainer.className = 'scrummer-picker-container';
-  if (settings.showStoryPoints) itemsContainer.appendChild(buildPickerRow('story'));
-  if (settings.showPostPoints) itemsContainer.appendChild(buildPickerRow('post'));
+  const titleDataConfiguration = getTitleDataConfiguration(settings)
+  for (const dataIdentifier in titleDataConfiguration) {
+    const { isActivated, pickerClass, regex, delimiters } = titleDataConfiguration[dataIdentifier]
+    if (isActivated && pickerClass) {
+      itemsContainer.appendChild(
+        buildPickerRow(pickerClass, regex, delimiters)
+      );
+    }
+  }
 
   return itemsContainer;
 }
@@ -352,23 +368,17 @@ Podium.keydown = function (k) {
 /**
  * Action when a picker button is clicked
  */
-const insertPoints = (value, storyOrPost, event) => {
+const insertDataInTitle = (value, regexMatchingDataInTitle, delimitersOfDataInTitle, event) => {
   event.stopPropagation();
 
-  let titleField = document.querySelector('.js-card-detail-title-input');
+  const titleField = document.querySelector('.js-card-detail-title-input');
 
   titleField.click();
   titleField.focus();
 
   // Remove old points
-  if (storyOrPost === 'story') {
-    let cleanedTitle = titleField.value.replace(titleDataConfiguration.story.regex, '').trim();
-    titleField.value = '(' + value + ') ' + cleanedTitle;
-  }
-  else {
-    let cleanedTitle = titleField.value.replace(titleDataConfiguration.post.regex, '').trim();
-    titleField.value = '[' + value + '] ' + cleanedTitle;
-  }
+  const cleanedTitle = titleField.value.replace(regexMatchingDataInTitle, '').trim();
+  titleField.value = `${delimitersOfDataInTitle[0]}${value}${delimitersOfDataInTitle[1]}  ${cleanedTitle}`;
 
   Podium.keydown(13);
 
