@@ -156,9 +156,10 @@ const calculatePointsForCard = (card) => {
 
   if (!contentMutated) { return sanitizeExtractedDataIndex(extractedDataIndex) }
 
+  let cleanedTitle = originalTitle;
   for (const dataIdentifier in extractedDataIndex) {
     const extractedData = extractedDataIndex[dataIdentifier]
-    const { attribute, cssClass } = titleDataConfiguration[dataIdentifier];
+    const { attribute, cssClass, isActivated, regex } = titleDataConfiguration[dataIdentifier];
     if (extractedData !== undefined) {
       const badgeElement = findOrInsertSpan(cardNameElement, cssClass, cardNameElement.lastChild);
       badgeElement.textContent = formatPoints(extractedData);
@@ -166,11 +167,9 @@ const calculatePointsForCard = (card) => {
     } else {
       removeIfExists(cardNameElement, cssClass);
     }
+    if (isActivated) cleanedTitle = cleanedTitle.replace(regex, '');
   }
 
-  let cleanedTitle = originalTitle;
-  if (settings.showStoryPoints) cleanedTitle = cleanedTitle.replace(titleDataConfiguration.story.regex, '');
-  if (settings.showPostPoints) cleanedTitle = cleanedTitle.replace(titleDataConfiguration.post.regex, '');
   cardNameElement.lastChild.textContent = cleanedTitle.trim();
 
   return sanitizeExtractedDataIndex(extractedDataIndex)
