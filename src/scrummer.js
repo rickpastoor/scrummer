@@ -26,6 +26,7 @@ const getDefaultValueFromConfig = (titleDataConfiguration) => {
   for (const dataIdentifier in titleDataConfiguration) {
     defaultValue[dataIdentifier] = titleDataConfiguration[dataIdentifier].defaultValue
   }
+  return defaultValue
 }
 
 const containsNodeWithClass = (nodeList, className) => {
@@ -186,6 +187,8 @@ const calculatePointsForList = (list) => {
     attributes: true
   });
 
+  titleDataConfiguration = getTitleDataConfiguration(settings)
+
   // Array.slice can convert a NodeList to an array
   let listPoints = Array.prototype.slice.call(list.querySelectorAll('.list-card:not(.hide)'))
     .reduce((listPoints, card) => {
@@ -193,7 +196,7 @@ const calculatePointsForList = (list) => {
       listPoints.story += cardPoints.story;
       listPoints.post += cardPoints.post;
       return listPoints;
-    }, { story: 0, post: 0 });
+    }, getDefaultValueFromConfig(titleDataConfiguration));
 
   let listHeader = null;
   if (settings.showColumnTotals && (listHeader = list.querySelector('.js-list-header'))) {
@@ -212,6 +215,8 @@ const calculatePointsForList = (list) => {
 }
 
 const calculatePointsForBoard = () => {
+  titleDataConfiguration = getTitleDataConfiguration(settings)
+
   // Array.slice can convert a NodeList to an array
   let boardPoints = Array.prototype.slice.call(document.querySelectorAll('.list'))
     .reduce((boardPoints, list) => {
@@ -219,7 +224,7 @@ const calculatePointsForBoard = () => {
       boardPoints.story += listPoints.story;
       boardPoints.post += listPoints.post;
       return boardPoints;
-    }, { story: 0, post: 0 });
+    }, getDefaultValueFromConfig(titleDataConfiguration));
 
   let boardHeader = null;
   if (settings.showBoardTotals && (boardHeader = document.querySelector('.js-board-header'))) {
