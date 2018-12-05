@@ -112,6 +112,31 @@ const formatPoints = (points) => {
   return Math.round(points * 10) / 10;
 }
 
+const insertDataAggregationInElement = (element, childrenQuerySelector, extractData, insertSlotQuerySelector, titleDataConfiguration) => {
+  const dataToInsert = Array.prototype.slice.call(element.querySelectorAll(childrenQuerySelector))
+    .reduce((dataFromChildrenAggregation, child) => {
+      const childData = extractData(child);
+      for (const dataIdentifier in dataFromChildrenAggregation) {
+        dataFromChildrenAggregation[dataIdentifier] += childData[dataIdentifier]
+      }
+      return dataFromChildrenAggregation;
+    }, getDefaultValueFromConfig(titleDataConfiguration));
+
+  const elementInsertSlot = element.querySelector(insertSlotQuerySelector);
+  if (settings.showColumnTotals && elementInsertSlot) {
+    // Add or update points badges
+    for (const dataIdentifier in titleDataConfiguration) {
+      const { isActivated, cssClass } = titleDataConfiguration[dataIdentifier]
+      if (isActivated) {
+        let badge = findOrInsertSpan(elementInsertSlot, cssClass, elementInsertSlot.querySelector('.js-list-name-input'));
+        badge.textContent = formatPoints(dataToInsert[dataIdentifier]);
+      }
+    }
+  }
+
+  return dataToInsert
+}
+
 const calculatePointsForCard = (card) => {
   let contentMutated = false;
   const titleDataConfiguration = getTitleDataConfiguration(settings)
@@ -161,14 +186,14 @@ const calculatePointsForCard = (card) => {
   for (const dataIdentifier in extractedDataIndex) {
     const extractedData = extractedDataIndex[dataIdentifier]
     const { attribute, cssClass, isActivated, regex } = titleDataConfiguration[dataIdentifier];
-    if (extractedData !== undefined) {
-      const badgeElement = findOrInsertSpan(cardNameElement, cssClass, cardNameElement.lastChild);
-      badgeElement.textContent = formatPoints(extractedData);
-      card.setAttribute(attribute, extractedData);
-    } else {
+    if (extractedData === undefined || !isActivated) {
       removeIfExists(cardNameElement, cssClass);
+      continue
     }
-    if (isActivated) cleanedTitle = cleanedTitle.replace(regex, '');
+    const badgeElement = findOrInsertSpan(cardNameElement, cssClass, cardNameElement.lastChild);
+    badgeElement.textContent = formatPoints(extractedData);
+    card.setAttribute(attribute, extractedData);
+    cleanedTitle = cleanedTitle.replace(regex, '');
   }
 
   cardNameElement.lastChild.textContent = cleanedTitle.trim();
@@ -188,56 +213,25 @@ const calculatePointsForList = (list) => {
   });
 
   titleDataConfiguration = getTitleDataConfiguration(settings)
-
-  // Array.slice can convert a NodeList to an array
-  let listPoints = Array.prototype.slice.call(list.querySelectorAll('.list-card:not(.hide)'))
-    .reduce((listPoints, card) => {
-      let cardPoints = calculatePointsForCard(card);
-      listPoints.story += cardPoints.story;
-      listPoints.post += cardPoints.post;
-      return listPoints;
-    }, getDefaultValueFromConfig(titleDataConfiguration));
-
-  let listHeader = null;
-  if (settings.showColumnTotals && (listHeader = list.querySelector('.js-list-header'))) {
-    // Add or update points badges
-    if (settings.showStoryPoints) {
-      let badge = findOrInsertSpan(listHeader, 'scrummer-list-points', listHeader.querySelector('.js-list-name-input'));
-      badge.textContent = formatPoints(listPoints.story);
-    }
-    if (settings.showPostPoints) {
-      let badge = findOrInsertSpan(listHeader, 'scrummer-list-post-points', listHeader.querySelector('.js-list-name-input'));
-      badge.textContent = formatPoints(listPoints.post);
-    }
-  }
-
-  return listPoints;
+  const listData = insertDataAggregationInElement(
+    list,
+    '.list-card:not(.hide)',
+    calculatePointsForCard,
+    '.js-list-header',
+    titleDataConfiguration
+  )
+  return listData;
 }
 
 const calculatePointsForBoard = () => {
   titleDataConfiguration = getTitleDataConfiguration(settings)
-
-  // Array.slice can convert a NodeList to an array
-  let boardPoints = Array.prototype.slice.call(document.querySelectorAll('.list'))
-    .reduce((boardPoints, list) => {
-      let listPoints = calculatePointsForList(list);
-      boardPoints.story += listPoints.story;
-      boardPoints.post += listPoints.post;
-      return boardPoints;
-    }, getDefaultValueFromConfig(titleDataConfiguration));
-
-  let boardHeader = null;
-  if (settings.showBoardTotals && (boardHeader = document.querySelector('.js-board-header'))) {
-    // Add or update points badges
-    if (settings.showStoryPoints) {
-      let badge = findOrInsertSpan(boardHeader, 'scrummer-board-points', boardHeader.querySelector('.board-header-btn-name'));
-      badge.textContent = formatPoints(boardPoints.story);
-    }
-    if (settings.showPostPoints) {
-      let badge = findOrInsertSpan(boardHeader, 'scrummer-board-post-points', boardHeader.querySelector('.board-header-btn-name'));
-      badge.textContent = formatPoints(boardPoints.post);
-    }
-  }
+  insertDataAggregationInElement(
+    document,
+    '.list',
+    calculatePointsForList,
+    '.js-board-header',
+    titleDataConfiguration
+  )
 
   listChangeObserver.observe(document.querySelector('.js-list-sortable'), {
     childList: true,
@@ -266,7 +260,7 @@ const calculatePointsForBoardDebounced = () => {
   debounce(calculatePointsForBoard, 100)();
 }
 
-const buildPickerRow = (buttonClassnameF, regexMatchingDataInTitle, delimitersOfDataInTitle) => {
+const buildPickerRow = (buttonClassname, regexMatchingDataInTitle, delimitersOfDataInTitle) => {
   let row = document.createElement('div');
   row.className = 'scrummer-picker-row';
 
@@ -274,7 +268,7 @@ const buildPickerRow = (buttonClassnameF, regexMatchingDataInTitle, delimitersOf
     let button = document.createElement('a');
     button.textContent = value;
     button.href = 'javascript:;';
-    button.className = buttonClassnameF;
+    button.className = buttonClassname;
     button.addEventListener(
       'click',
       insertDataInTitle.bind(this, value, regexMatchingDataInTitle, delimitersOfDataInTitle)

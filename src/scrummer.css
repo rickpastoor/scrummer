@@ -1,5 +1,4 @@
-.scrummer-points, .scrummer-list-points, .scrummer-board-points, .scrummer-picker-button,
-.scrummer-post-points, .scrummer-list-post-points, .scrummer-board-post-points, .scrummer-picker-post-button {
+.scrummer-points, .scrummer-picker-button, .scrummer-post-points, .scrummer-picker-post-button {
   padding: 1px 5px;
   margin-right: 3px;
 
@@ -8,13 +7,13 @@
   font-weight: normal;
 }
 
-.scrummer-points, .scrummer-list-points, .scrummer-board-points, .scrummer-picker-button {
+.scrummer-points, .scrummer-picker-button {
   background: #47bae0;
   background: linear-gradient(to bottom,  #47bae0 50%, #4dbbe2 50%, #33b5e0 50%); /* W3C */
   border-radius: 5px;
 }
 
-.scrummer-post-points, .scrummer-list-post-points, .scrummer-board-post-points, .scrummer-picker-post-button {
+.scrummer-post-points, .scrummer-picker-post-button {
   background: #81cae2;
   background: linear-gradient(to bottom,  #81cae2 50%, #79c6e0 50%, #6cc1dd 50%); /* W3C */
 }
@@ -25,11 +24,11 @@
   position: relative;
 }
 
-.scrummer-list-points, .scrummer-list-post-points {
+.js-list-header .scrummer-points, .js-list-header .scrummer-post-points {
   float: left;
 }
 
-.scrummer-board-points, .scrummer-board-post-points {
+.js-list-header .scrummer-points, .js-list-header .scrummer-post-points {
   float: left;
   margin-top: 6px;
 }
