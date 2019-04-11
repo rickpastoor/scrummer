@@ -41,9 +41,9 @@
   background: #ec4706;
   background: linear-gradient(
     to bottom,
-    #ec4706 50%,
-    orange 50%,
-    #fc4929 50%
+    #da9fe9 50%,
+    #da9fe9 50%,
+    #da9fe9 50%
   ); /* W3C */
   border-radius: 5px;
 }
