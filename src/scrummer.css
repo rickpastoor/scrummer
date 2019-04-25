@@ -1,5 +1,9 @@
-.scrummer-points, .scrummer-list-points, .scrummer-board-points, .scrummer-picker-button,
-.scrummer-post-points, .scrummer-list-post-points, .scrummer-board-post-points, .scrummer-picker-post-button {
+.scrummer-points,
+.scrummer-picker-button,
+.scrummer-post-points,
+.scrummer-picker-post-button,
+.scrummer-hour-points,
+.scrummer-picker-hour-button {
   padding: 1px 5px;
   margin-right: 3px;
 
@@ -8,28 +12,53 @@
   font-weight: normal;
 }
 
-.scrummer-points, .scrummer-list-points, .scrummer-board-points, .scrummer-picker-button {
+.scrummer-points,
+.scrummer-picker-button {
   background: #47bae0;
-  background: linear-gradient(to bottom,  #47bae0 50%, #4dbbe2 50%, #33b5e0 50%); /* W3C */
+  background: linear-gradient(
+    to bottom,
+    #47bae0 50%,
+    #4dbbe2 50%,
+    #33b5e0 50%
+  ); /* W3C */
   border-radius: 5px;
 }
 
-.scrummer-post-points, .scrummer-list-post-points, .scrummer-board-post-points, .scrummer-picker-post-button {
+.scrummer-post-points,
+.scrummer-picker-post-button {
   background: #81cae2;
-  background: linear-gradient(to bottom,  #81cae2 50%, #79c6e0 50%, #6cc1dd 50%); /* W3C */
+  background: linear-gradient(
+    to bottom,
+    #81cae2 50%,
+    #79c6e0 50%,
+    #6cc1dd 50%
+  ); /* W3C */
+  border-radius: 5px;
 }
 
-.scrummer-points, .scrummer-post-points {
+.scrummer-hour-points,
+.scrummer-picker-hour-button {
+  background: #ec4706;
+  background: linear-gradient(
+    to bottom,
+    #da9fe9 50%,
+    #da9fe9 50%,
+    #da9fe9 50%
+  ); /* W3C */
+  border-radius: 5px;
+}
+
+.scrummer-points,
+.scrummer-post-points,
+.scrummer-hour-points {
   font-size: 12px;
   top: -1px;
   position: relative;
 }
 
-.scrummer-list-points, .scrummer-list-post-points {
-  float: left;
-}
-
-.scrummer-board-points, .scrummer-board-post-points {
+.js-list-header .scrummer-points,
+.js-list-header .scrummer-post-points,
+.js-list-header .scrummer-hour-points {
   float: left;
   margin-top: 6px;
 }
@@ -81,4 +110,3 @@ textarea.mod-list-name.list-header-name {
   padding: 0px 3px;
   border-radius: 5px;
 }
-
