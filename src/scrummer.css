@@ -48,6 +48,11 @@
   border-radius: 5px;
 }
 
+.scrummer-badges {
+  display: flex;
+  padding-bottom: 8px;
+}
+
 .scrummer-points,
 .scrummer-post-points,
 .scrummer-hour-points {
@@ -97,16 +102,4 @@ textarea.mod-list-name.list-header-name {
 
 .scrummer-picker-post-button:hover {
   color: #ccc !important;
-}
-
-.scrummer-card-id.hide {
-  display: inline;
-}
-
-.scrummer-card-id {
-  background-color: #ffdd00;
-  border: 1px solid #ffdd00;
-  margin-right: 3px;
-  padding: 0px 3px;
-  border-radius: 5px;
 }

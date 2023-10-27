@@ -1,5 +1,16 @@
 const POINTS_SCALE = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100];
 
+const MAPPING_SELECTORS = {
+  'lists': '[data-testid="lists"]',
+  'list': '[data-testid="list"]',
+  'listNameInput': '[data-testid="list-name-textarea"]',
+  'listHeader': '[data-testid="list-header"]',
+  'card': '[data-testid="trello-card"]',
+  'cardId': '[data-card-id]',
+  'cardName': '[data-testid="card-name"]',
+  'minimalCard': '[data-testid="minimal-card"]',
+}
+
 const getTitleDataConfiguration = settings => ({
   story: {
     attribute: 'data-calculated-points',
@@ -57,21 +68,27 @@ let listChangeObserver = new MutationObserver(function(mutations) {
     if (
       mutation.addedNodes.length === 1 &&
       containsNodeWithScrummerClass(mutation.addedNodes)
-    )
+    ) {
       return;
+    }
+
+    const dataTestId = mutation.target.getAttribute('data-testid');
+    if(!dataTestId) return;
 
     // If the list was modified, recalculate
     if (
-      mutation.target.classList.contains('list-cards') ||
-      mutation.target.classList.contains('list-header-num-cards') ||
-      mutation.target.classList.contains('js-list-sortable')
+      dataTestId === 'list-cards' ||
+      dataTestId === 'list'
     ) {
       setTimeout(calculatePointsForBoardDebounced);
       return;
     }
 
     // If a single card's content is mutated
-    if (mutation.target.classList.contains('js-card-name')) {
+    if (
+      dataTestId === 'card-name' ||
+      dataTestId === 'trello-card'
+    ) {
       mutation.target.setAttribute('data-mutated', 1);
 
       setTimeout(calculatePointsForBoardDebounced);
@@ -149,14 +166,22 @@ const insertDataAggregationInElement = (
 
   const elementInsertSlot = element.querySelector(insertSlotQuerySelector);
   if (settings.showColumnTotals && elementInsertSlot) {
+    // Create a div to wrap badges
+    let badgesContainer = elementInsertSlot.querySelector('.scrummer-badges');
+    if(!badgesContainer) {
+      badgesContainer = document.createElement('div');
+      badgesContainer.className = 'scrummer-badges';
+      elementInsertSlot.appendChild(badgesContainer);
+    }
+
     // Add or update points badges
     for (const dataIdentifier in titleDataConfiguration) {
       const { isActivated, cssClass } = titleDataConfiguration[dataIdentifier];
       if (isActivated) {
         let badge = findOrInsertSpan(
-          elementInsertSlot,
+          badgesContainer,
           cssClass,
-          elementInsertSlot.querySelector('.js-list-name-input')
+          badgesContainer.querySelector(MAPPING_SELECTORS.listNameInput)
         );
         badge.textContent = formatPoints(dataToInsert[dataIdentifier]);
       }
@@ -170,21 +195,12 @@ const calculatePointsForCard = card => {
   let contentMutated = false;
   const titleDataConfiguration = getTitleDataConfiguration(settings);
 
-  let cardNameElement = card.querySelector('.js-card-name');
+  let cardNameElement = card.querySelector(MAPPING_SELECTORS.cardName);
   if (!cardNameElement) {
     return getDefaultValueFromConfig(titleDataConfiguration);
   }
 
   let originalTitle = card.getAttribute('data-original-title');
-
-  let cardShortId = cardNameElement.querySelector('.card-short-id');
-  if (
-    settings.showCardNumbers &&
-    cardShortId &&
-    !cardShortId.classList.contains('scrummer-card-id')
-  ) {
-    cardShortId.classList.add('scrummer-card-id');
-  }
 
   if (!originalTitle || cardNameElement.getAttribute('data-mutated') == 1) {
     originalTitle = cardNameElement.lastChild.textContent;
@@ -213,7 +229,7 @@ const calculatePointsForCard = card => {
     // Trello sometimes drops our badge, so if that happens we need to redraw
     if (
       card.getAttribute(attribute) !== null &&
-      !card.querySelector(cssClass)
+      !card.querySelector(`.${cssClass}`)
     ) {
       contentMutated = true;
     }
@@ -233,6 +249,7 @@ const calculatePointsForCard = card => {
       dataIdentifier
     ];
     if (extractedData === undefined || !isActivated) {
+      card.removeAttribute(attribute);
       removeIfExists(cardNameElement, cssClass);
       continue;
     }
@@ -246,28 +263,31 @@ const calculatePointsForCard = card => {
     cleanedTitle = cleanedTitle.replace(regex, '');
   }
 
+  // Trigger a mutation
+  if(
+    extractedDataIndex.story === undefined &&
+    extractedDataIndex.post === undefined &&
+    extractedDataIndex.hour === undefined
+  ) {
+    findOrInsertSpan(
+      cardNameElement,
+      'no-points',
+      cardNameElement.lastChild
+    );
+  }
+
   cardNameElement.lastChild.textContent = cleanedTitle.trim();
 
   return sanitizeExtractedDataIndex(extractedDataIndex);
 };
 
 const calculatePointsForList = list => {
-  listChangeObserver.observe(list, {
-    childList: true,
-    characterData: false,
-    attributes: false,
-    subtree: true
-  });
-  listChangeObserver.observe(list.querySelector('.list-header-num-cards'), {
-    attributes: true
-  });
-
   titleDataConfiguration = getTitleDataConfiguration(settings);
   const listData = insertDataAggregationInElement(
     list,
-    '.list-card:not(.hide)',
+    MAPPING_SELECTORS.card,
     calculatePointsForCard,
-    '.js-list-header',
+    MAPPING_SELECTORS.listHeader,
     titleDataConfiguration
   );
   return listData;
@@ -277,16 +297,17 @@ const calculatePointsForBoard = () => {
   titleDataConfiguration = getTitleDataConfiguration(settings);
   insertDataAggregationInElement(
     document,
-    '.list',
+    MAPPING_SELECTORS.list,
     calculatePointsForList,
     '.js-board-header',
     titleDataConfiguration
   );
 
-  listChangeObserver.observe(document.querySelector('.js-list-sortable'), {
+  listChangeObserver.observe(document.querySelector(MAPPING_SELECTORS.lists), {
     childList: true,
     characterData: false,
-    attributes: false
+    attributes: false,
+    subtree: true
   });
 };
 
@@ -320,9 +341,8 @@ const buildPickerRow = (
   row.className = 'scrummer-picker-row';
 
   POINTS_SCALE.forEach(function(value) {
-    let button = document.createElement('a');
+    let button = document.createElement('button');
     button.textContent = value;
-    button.href = 'javascript:;';
     button.className = buttonClassname;
     button.addEventListener(
       'click',
@@ -476,7 +496,7 @@ const insertDataInTitle = (
 };
 
 const checkForLists = () => {
-  if (document.querySelectorAll('.list').length > 0) {
+  if (document.querySelectorAll(MAPPING_SELECTORS.list).length > 0) {
     calculatePointsForBoard();
 
     if (settings.showPicker) {
@@ -516,5 +536,5 @@ chrome.storage.sync.get(null, _settings => {
 
   // Launch the plugin by checking at a certain interval if any lists have been loaded.
   // Wait 1 second because some DOM rebuilding may happen late.
-  setTimeout(checkForLists, 1000);
+  window.onload = setTimeout(checkForLists, 1000);
 });
