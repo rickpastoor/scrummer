@@ -68,6 +68,14 @@
   margin-top: 6px;
 }
 
+.scrummer-card-id {
+  background-color: #ffdd00;
+  border: 1px solid #ffdd00;
+  margin-right: 3px;
+  padding: 0px 3px;
+  border-radius: 5px;
+}
+
 textarea.mod-list-name.list-header-name {
   float: left;
   width: 60%;

@@ -87,7 +87,8 @@ let listChangeObserver = new MutationObserver(function(mutations) {
     // If a single card's content is mutated
     if (
       dataTestId === 'card-name' ||
-      dataTestId === 'trello-card'
+      dataTestId === 'trello-card' ||
+      dataTestId === 'scrummer-card-id'
     ) {
       mutation.target.setAttribute('data-mutated', 1);
 
@@ -198,6 +199,18 @@ const calculatePointsForCard = card => {
   let cardNameElement = card.querySelector(MAPPING_SELECTORS.cardName);
   if (!cardNameElement) {
     return getDefaultValueFromConfig(titleDataConfiguration);
+  }
+
+  // create a span to display the card number
+  const cardNumber = extractCardNumberFromCardName(cardNameElement);
+  if(cardNumber) {
+    const cardNumberElement = findOrInsertSpan(
+      cardNameElement,
+      'scrummer-card-id',
+      cardNameElement.lastChild
+    );
+
+    cardNumberElement.textContent = '#' + cardNumber;
   }
 
   let originalTitle = card.getAttribute('data-original-title');
@@ -494,6 +507,13 @@ const insertDataInTitle = (
       document.querySelector('.scrummer-picker-container')
     );
 };
+
+  const extractCardNumberFromCardName = (cardName) => {
+    const href = cardName.getAttribute('href');
+    const regex = /\/(\d+)-/;
+    const match = href.match(regex);
+    return match ? match[1] : null;
+  }
 
 const checkForLists = () => {
   if (document.querySelectorAll(MAPPING_SELECTORS.list).length > 0) {
